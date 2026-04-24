@@ -1,0 +1,37 @@
+
+ Entering Test Suite: vc-TestSinglePortMem
+VCD info: dumpfile dump.vcd opened for output.
+  + Running Test Case: TestBasic_srcdelay0_sinkdelay0
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 4xxxxxxxx == 4xxxxxxxx ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 4xxxxxxxx == 4xxxxxxxx ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 00a0b0c0d == 00a0b0c0d ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 00e0f0102 == 00e0f0102 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 4xxxxxxxx == 4xxxxxxxx ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 50a0b0c0d == 50a0b0c0d ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 10a0b0cef == 10a0b0cef ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 1000a0b0c == 1000a0b0c ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 100000a0b == 100000a0b ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 10000000a == 10000000a ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 4xxxxxxxx == 4xxxxxxxx ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 601020304 == 601020304 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 20102beef == 20102beef ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 200000102 == 200000102 ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+  + Running Test Case: TestBasic_srcdelay3_sinkdelay10
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 40a0b0c0d == 40a0b0c0d ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 40e0f0102 == 40e0f0102 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 00a0b0c0d == 00a0b0c0d ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 00e0f0102 == 00e0f0102 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 40a0b0c0d == 40a0b0c0d ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 50a0b0cef == 50a0b0cef ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 10a0b0cef == 10a0b0cef ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 1000a0b0c == 1000a0b0c ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 100000a0b == 100000a0b ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 10000000a == 10000000a ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 401020304 == 401020304 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 60102beef == 60102beef ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 20102beef == 20102beef ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 200000102 == 200000102 ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+
+../vc/vc-TestSinglePortMem.t.v:298: $finish called at 5685 (1s)

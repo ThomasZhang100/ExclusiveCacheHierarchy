@@ -1,0 +1,71 @@
+
+ Entering Test Suite: vc-Regfiles
+  + Running Test Case: vc_Regfile_1w1r_pf
+     [ -note- ]           |           
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ]           | write 0 aa
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ] read 0 aa |           
+     [ passed ] Test ( rdata ) succeeded, [ aa == aa ]
+     [ -note- ]           | write 0 aa
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ]           | write 1 bb
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ]           | write 2 cc
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ]           | write 3 dd
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ]           | write 4 ee
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ] read 0 aa |           
+     [ passed ] Test ( rdata ) succeeded, [ aa == aa ]
+     [ -note- ] read 1 bb |           
+     [ passed ] Test ( rdata ) succeeded, [ bb == bb ]
+     [ -note- ] read 2 cc |           
+     [ passed ] Test ( rdata ) succeeded, [ cc == cc ]
+     [ -note- ] read 3 dd |           
+     [ passed ] Test ( rdata ) succeeded, [ dd == dd ]
+     [ -note- ] read 4 ee |           
+     [ passed ] Test ( rdata ) succeeded, [ ee == ee ]
+     [ -note- ]           | write 0 00
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ]           | write 1 11
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ]           | write 2 22
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ]           | write 3 33
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ]           | write 4 44
+     [ passed ] Test ( rdata ) succeeded, [ xx == zz ]
+     [ -note- ] read 0 00 |           
+     [ passed ] Test ( rdata ) succeeded, [ 00 == 00 ]
+     [ -note- ] read 1 11 |           
+     [ passed ] Test ( rdata ) succeeded, [ 11 == 11 ]
+     [ -note- ] read 2 22 |           
+     [ passed ] Test ( rdata ) succeeded, [ 22 == 22 ]
+     [ -note- ] read 3 33 |           
+     [ passed ] Test ( rdata ) succeeded, [ 33 == 33 ]
+     [ -note- ] read 4 44 |           
+     [ passed ] Test ( rdata ) succeeded, [ 44 == 44 ]
+     [ -note- ] read 1 11 | write 0 0a
+     [ passed ] Test ( rdata ) succeeded, [ 11 == 11 ]
+     [ -note- ] read 2 22 | write 1 1b
+     [ passed ] Test ( rdata ) succeeded, [ 22 == 22 ]
+     [ -note- ] read 3 33 | write 2 2c
+     [ passed ] Test ( rdata ) succeeded, [ 33 == 33 ]
+     [ -note- ] read 4 44 | write 3 3d
+     [ passed ] Test ( rdata ) succeeded, [ 44 == 44 ]
+     [ -note- ] read 0 0a | write 4 4e
+     [ passed ] Test ( rdata ) succeeded, [ 0a == 0a ]
+     [ -note- ] read 0 0a | write 0 5a
+     [ passed ] Test ( rdata ) succeeded, [ 0a == 0a ]
+     [ -note- ] read 1 1b | write 1 6b
+     [ passed ] Test ( rdata ) succeeded, [ 1b == 1b ]
+     [ -note- ] read 2 2c | write 2 7c
+     [ passed ] Test ( rdata ) succeeded, [ 2c == 2c ]
+     [ -note- ] read 3 3d | write 3 8d
+     [ passed ] Test ( rdata ) succeeded, [ 3d == 3d ]
+     [ -note- ] read 4 4e | write 4 9e
+     [ passed ] Test ( rdata ) succeeded, [ 4e == 4e ]
+
+../vc/vc-Regfiles.t.v:128: $finish called at 465 (1s)

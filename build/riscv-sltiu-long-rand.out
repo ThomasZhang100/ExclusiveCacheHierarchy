@@ -1,0 +1,11 @@
+WARNING: ../riscvlong/riscvlong-randdelay-sim.v:154: $readmemh: The behaviour for reg[...] mem[N:0]; $readmemh("...", mem); changed in the 1364-2005 standard. To avoid ambiguity, use mem[0:N] or explicit range parameters $readmemh("...", mem, start, stop);. Defaulting to 1364-2005 behavior.
+VCD info: dumpfile ../tests/build/vmh/riscv-sltiu-rand.vcd opened for output.
+*** PASSED ***
+--------------------------------------------
+ STATS                                      
+--------------------------------------------
+ status     =          1
+ num_cycles =        317
+ num_inst   =        126
+ ipc        = 0.397476
+../riscvlong/riscvlong-randdelay-sim.v:335: $finish called at 3265 (1s)

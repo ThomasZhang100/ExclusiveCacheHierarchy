@@ -1,0 +1,27 @@
+
+ Entering Test Suite: riscv-InstMsg
+  + Running Test Case: R-type Inst
+     [ passed ] Test (  add    r04, r00, r03      ) succeeded, [ 00300233 == 00300233 ]
+     [ passed ] Test (  sub    r20, r31, r09      ) succeeded, [ 409f8a33 == 409f8a33 ]
+     [ passed ] Test (  sll    r00, r19, r12      ) succeeded, [ 00c99033 == 00c99033 ]
+     [ passed ] Test (  mul    r00, r07, r00      ) succeeded, [ 02038033 == 02038033 ]
+     [ passed ] Test (  div    r00, r00, r15      ) succeeded, [ 02f04033 == 02f04033 ]
+  + Running Test Case: I-type Inst
+     [ passed ] Test (  addi   r15, r19, fffff8ad ) succeeded, [ 8ad98793 == 8ad98793 ]
+     [ passed ] Test (  ori    r02, r03, 000004be ) succeeded, [ 4be1e113 == 4be1e113 ]
+     [ passed ] Test (  sltiu  r12, r30, fffffabc ) succeeded, [ abcf3613 == abcf3613 ]
+     [ passed ] Test (  srai   r28, r10, 00000010 ) succeeded, [ 41055e13 == 41055e13 ]
+  + Running Test Case: S-type Inst
+     [ passed ] Test (  sw     r00, r12, ffffffff ) succeeded, [ fe062fa3 == fe062fa3 ]
+     [ passed ] Test (  sb     r19, r31, 00000120 ) succeeded, [ 133f8023 == 133f8023 ]
+  + Running Test Case: SB-type Inst
+     [ passed ] Test (  beq    r17, r30, 00000bee ) succeeded, [ 3fe887e3 == 3fe887e3 ]
+     [ passed ] Test (  blt    r00, r04, fffff01c ) succeeded, [ 80404e63 == 80404e63 ]
+  + Running Test Case: U-type Inst
+     [ passed ] Test (  lui    r17, deadb000      ) succeeded, [ deadb8b7 == deadb8b7 ]
+     [ passed ] Test (  auipc  r00, 4c1bb000      ) succeeded, [ 4c1bb017 == 4c1bb017 ]
+  + Running Test Case: UJ-type Inst
+     [ passed ] Test (  jal    r00, 0004dfca      ) succeeded, [ 7cb4d06f == 7cb4d06f ]
+     [ passed ] Test (      undefined inst        ) succeeded, [ 842f1fe7 == 842f1fe7 ]
+
+../riscvlong/riscvlong-InstMsg.t.v:317: $finish called at 295 (1s)

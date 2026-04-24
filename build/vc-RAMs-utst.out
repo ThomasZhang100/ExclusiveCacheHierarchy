@@ -1,0 +1,8 @@
+
+ Entering Test Suite: vc-RAMs
+  + Running Test Case: vc-RAM_rst_1w1r_pf
+     [ passed ] Test ( Reset data correct? ) succeeded, [ 2 == 2 ]
+     [ passed ] Test ( Read data correct? ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( Read data correct? ) succeeded, [ 3 == 3 ]
+
+../vc/vc-RAMs.t.v:89: $finish called at 205 (1s)

@@ -1,0 +1,24 @@
+
+ Entering Test Suite: vc-TestSink
+  + Running Test Case: TestBasic_msg8
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ bb == bb ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ cc == cc ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ dd == dd ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ee == ee ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ff == ff ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+  + Running Test Case: TestBasic_msg13
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 11aa == 11aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 11aa == 11aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 11aa == 11aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 02bb == 02bb ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 13cc == 13cc ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 04dd == 04dd ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 15ee == 15ee ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 06ff == 06ff ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+
+../vc/vc-TestSink.t.v:139: $finish called at 1185 (1s)

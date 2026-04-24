@@ -1,0 +1,41 @@
+
+ Entering Test Suite: vc-TestRandDelaySink
+  + Running Test Case: TestBasic_rdelay0
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ bb == bb ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ cc == cc ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ dd == dd ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ee == ee ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ff == ff ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+  + Running Test Case: TestBasic_rdelay1
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ bb == bb ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ cc == cc ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ dd == dd ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ee == ee ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ff == ff ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+  + Running Test Case: TestBasic_rdelay2
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ bb == bb ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ cc == cc ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ dd == dd ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ee == ee ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ff == ff ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+  + Running Test Case: TestBasic_rdelay10
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ aa == aa ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ bb == bb ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ cc == cc ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ dd == dd ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ee == ee ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ff == ff ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+
+../vc/vc-TestRandDelaySink.t.v:216: $finish called at 2245 (1s)

@@ -1,0 +1,8 @@
+
+ Entering Test Suite: vc-StateElements
+  + Running Test Case: vc_DFF_pf
+     [ passed ] Test ( #1 ) succeeded, [ 00000000 == 0 ]
+     [ passed ] Test ( #2 ) succeeded, [ 00000000 == 0 ]
+     [ passed ] Test ( #3 ) succeeded, [ 00000001 == 1 ]
+
+../vc/vc-StateElements.t.v:46: $finish called at 155 (1s)

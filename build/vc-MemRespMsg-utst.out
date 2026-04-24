@@ -1,0 +1,25 @@
+
+ Entering Test Suite: vc-MemRespMsg
+  + Running Test Case: TestFullStr_data32
+     [ passed ] Test ( rd:1:0c0d ) succeeded, [ 10a0b0c0d == 10a0b0c0d ]
+     [ passed ] Test ( rd:2:0d0e ) succeeded, [ 20b0c0d0e == 20b0c0d0e ]
+     [ passed ] Test ( rd:0:0e0f ) succeeded, [ 00c0d0e0f == 00c0d0e0f ]
+     [ passed ] Test ( wr        ) succeeded, [ Xxxxxxxxx == Xxxxxxxxx ]
+     [ passed ] Test ( wr        ) succeeded, [ Xxxxxxxxx == Xxxxxxxxx ]
+     [ passed ] Test ( wr        ) succeeded, [ Xxxxxxxxx == Xxxxxxxxx ]
+  + Running Test Case: TestTinyStr_data32
+     [ passed ] Test ( rd ) succeeded, [ 10a0b0c0d == 10a0b0c0d ]
+     [ passed ] Test ( rd ) succeeded, [ 20b0c0d0e == 20b0c0d0e ]
+     [ passed ] Test ( rd ) succeeded, [ 00c0d0e0f == 00c0d0e0f ]
+     [ passed ] Test ( wr ) succeeded, [ Xxxxxxxxx == Xxxxxxxxx ]
+     [ passed ] Test ( wr ) succeeded, [ Xxxxxxxxx == Xxxxxxxxx ]
+     [ passed ] Test ( wr ) succeeded, [ Xxxxxxxxx == Xxxxxxxxx ]
+  + Running Test Case: TestFullStr_data64
+     [ passed ] Test ( rd:1:0c0d ) succeeded, [ 10a0b0c0d0a0b0c0d == 10a0b0c0d0a0b0c0d ]
+     [ passed ] Test ( rd:2:0d0e ) succeeded, [ 20b0c0d0e0b0c0d0e == 20b0c0d0e0b0c0d0e ]
+     [ passed ] Test ( rd:0:0e0f ) succeeded, [ 00c0d0e0f0c0d0e0f == 00c0d0e0f0c0d0e0f ]
+     [ passed ] Test ( wr        ) succeeded, [ Xxxxxxxxxxxxxxxxx == Xxxxxxxxxxxxxxxxx ]
+     [ passed ] Test ( wr        ) succeeded, [ Xxxxxxxxxxxxxxxxx == Xxxxxxxxxxxxxxxxx ]
+     [ passed ] Test ( wr        ) succeeded, [ Xxxxxxxxxxxxxxxxx == Xxxxxxxxxxxxxxxxx ]
+
+../vc/vc-MemRespMsg.t.v:182: $finish called at 305 (1s)

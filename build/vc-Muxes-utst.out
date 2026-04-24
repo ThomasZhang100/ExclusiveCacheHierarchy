@@ -1,0 +1,12 @@
+
+ Entering Test Suite: vc-Muxes
+  + Running Test Case: vc_Mux2_w32
+     [ passed ] Test ( sel == 0 ) succeeded, [ 0a0a0a0a == 0a0a0a0a ]
+     [ passed ] Test ( sel == 1 ) succeeded, [ b0b0b0b0 == b0b0b0b0 ]
+  + Running Test Case: vc_Mux4_w32
+     [ passed ] Test ( sel == 0 ) succeeded, [ 0a0a0a0a == 0a0a0a0a ]
+     [ passed ] Test ( sel == 1 ) succeeded, [ b0b0b0b0 == b0b0b0b0 ]
+     [ passed ] Test ( sel == 2 ) succeeded, [ 0c0c0c0c == 0c0c0c0c ]
+     [ passed ] Test ( sel == 3 ) succeeded, [ d0d0d0d0 == d0d0d0d0 ]
+
+../vc/vc-Muxes.t.v:105: $finish called at 185 (1s)

@@ -1,0 +1,106 @@
+
+ Entering Test Suite: vc-Misc
+  + Running Test Case: vc_PartitionedTriBuf
+     [ passed ] Test ( 0000 ) succeeded, [ zz == zz ]
+     [ passed ] Test ( 0001 ) succeeded, [ 0d == 0d ]
+     [ passed ] Test ( 0010 ) succeeded, [ 0c == 0c ]
+     [ passed ] Test ( 0100 ) succeeded, [ 0b == 0b ]
+     [ passed ] Test ( 1000 ) succeeded, [ 0a == 0a ]
+  + Running Test Case: vc_Counter
+     [ passed ] Test ( load 3  : next count  ) succeeded, [ 3 == 3 ]
+     [ passed ] Test ( load 3  : count       ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( none    : next count  ) succeeded, [ 3 == 3 ]
+     [ passed ] Test ( none    : count       ) succeeded, [ 3 == 3 ]
+     [ passed ] Test ( dec     : next count  ) succeeded, [ 2 == 2 ]
+     [ passed ] Test ( dec     : count       ) succeeded, [ 3 == 3 ]
+     [ passed ] Test ( dec     : next count  ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( dec     : count       ) succeeded, [ 2 == 2 ]
+     [ passed ] Test ( dec     : next count  ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( dec     : count       ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( none    : next count  ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( none    : count       ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( inc     : next count  ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( inc     : count       ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( inc     : next count  ) succeeded, [ 2 == 2 ]
+     [ passed ] Test ( inc     : count       ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( inc     : next count  ) succeeded, [ 3 == 3 ]
+     [ passed ] Test ( inc     : count       ) succeeded, [ 2 == 2 ]
+     [ passed ] Test ( inc     : next count  ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( inc     : count       ) succeeded, [ 3 == 3 ]
+     [ passed ] Test ( inc     : next count  ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( inc     : count       ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( inc     : next count  ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( inc     : count       ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( dec/inc : next count  ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( dec/inc : count       ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( none    : next count  ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( none    : count       ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( load 0  : next count  ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( load 0  : count       ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( none    : next count  ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( none    : count       ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( val = x : next count  ) succeeded, [ x == x ]
+     [ passed ] Test ( val = x : count       ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( none    : next count  ) succeeded, [ x == x ]
+     [ passed ] Test ( none    : count       ) succeeded, [ x == x ]
+     [ passed ] Test ( load 0  : next count  ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( load 0  : count       ) succeeded, [ x == x ]
+     [ passed ] Test ( inc = x : next count  ) succeeded, [ X == X ]
+     [ passed ] Test ( inc = x : count       ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( none    : next count  ) succeeded, [ X == X ]
+     [ passed ] Test ( none    : count       ) succeeded, [ X == X ]
+     [ passed ] Test ( load 0  : next count  ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( load 0  : count       ) succeeded, [ X == X ]
+     [ passed ] Test ( dec = x : next count  ) succeeded, [ x == x ]
+     [ passed ] Test ( dec = x : count       ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( none    : next count  ) succeeded, [ x == x ]
+     [ passed ] Test ( none    : count       ) succeeded, [ x == x ]
+     [ passed ] Test ( load 0  : next count  ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( load 0  : count       ) succeeded, [ x == x ]
+  + Running Test Case: vc_Decoder(2)
+     [ passed ] Test ( 2'd0  ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( 2'd1  ) succeeded, [ 2 == 2 ]
+     [ passed ] Test ( 2'd2  ) succeeded, [ 4 == 4 ]
+     [ passed ] Test ( 2'd3  ) succeeded, [ 8 == 8 ]
+     [ passed ] Test ( 2'b0x ) succeeded, [ X == X ]
+     [ passed ] Test ( 2'b1x ) succeeded, [ X == X ]
+     [ passed ] Test ( 2'bx0 ) succeeded, [ X == X ]
+     [ passed ] Test ( 2'bx1 ) succeeded, [ X == X ]
+     [ passed ] Test ( 2'bxx ) succeeded, [ x == x ]
+  + Running Test Case: vc_Decoder(2,3)
+     [ passed ] Test ( 2'd0  ) succeeded, [ 1 == 1 ]
+     [ passed ] Test ( 2'd1  ) succeeded, [ 2 == 2 ]
+     [ passed ] Test ( 2'd2  ) succeeded, [ 4 == 4 ]
+     [ passed ] Test ( 2'd3  ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( 2'b0x ) succeeded, [ X == X ]
+     [ passed ] Test ( 2'b1x ) succeeded, [ X == X ]
+     [ passed ] Test ( 2'bx0 ) succeeded, [ X == X ]
+     [ passed ] Test ( 2'bx1 ) succeeded, [ X == X ]
+     [ passed ] Test ( 2'bxx ) succeeded, [ x == x ]
+  + Running Test Case: vc_RandomNumberGenerator
+     [ -note- ] Random number = 14
+     [ -note- ] Random number = 03
+     [ -note- ] Random number = 14
+     [ -note- ] Random number = 0e
+     [ -note- ] Random number = 17
+     [ -note- ] Random number = 03
+     [ -note- ] Random number = 1f
+     [ -note- ] Random number = 14
+     [ -note- ] Random number = 1a
+     [ -note- ] Random number = 0a
+     [ -note- ] Random number = 10
+     [ -note- ] Random number = 06
+     [ -note- ] Random number = 11
+     [ -note- ] Random number = 1a
+     [ -note- ] Random number = 0f
+     [ -note- ] Random number = 19
+     [ -note- ] Random number = 09
+     [ -note- ] Random number = 03
+     [ -note- ] Random number = 01
+     [ -note- ] Random number = 03
+     [ -note- ] Random number = 19
+     [ -note- ] Random number = 15
+     [ -note- ] Random number = 14
+     [ -note- ] Random number = 18
+
+../vc/vc-Misc.t.v:309: $finish called at 915 (1s)

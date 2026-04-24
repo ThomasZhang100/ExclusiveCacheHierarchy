@@ -1,0 +1,19 @@
+
+ Entering Test Suite: vc-Arith
+  + Running Test Case: vc_Adder_w32
+     [ passed ] Test ( 0x000fffff + 0x0000ffff ) succeeded, [ 0010fffe == 0010fffe ]
+     [ passed ] Test ( 0x000fffff + 0x0000ffff (cout) ) succeeded, [ 0 == 0 ]
+     [ passed ] Test ( 0x000fffff + 0x0000ffff ) succeeded, [ 0000fffe == 0000fffe ]
+     [ passed ] Test ( 0x000fffff + 0x0000ffff (cout) ) succeeded, [ 1 == 1 ]
+  + Running Test Case: vc_Inc_w5
+     [ passed ] Test ( 5 + 4 ) succeeded, [ 09 == 09 ]
+     [ passed ] Test ( 3 + 4 ) succeeded, [ 07 == 07 ]
+     [ passed ] Test ( 9 + 4 ) succeeded, [ 0d == 0d ]
+  + Running Test Case: vc_ZeroExtend_w32
+     [ passed ] Test ( zeroExtend(16'h0fff) ) succeeded, [ 00000fff == 00000fff ]
+     [ passed ] Test ( zeroExtend(16'hffff) ) succeeded, [ 0000ffff == 0000ffff ]
+  + Running Test Case: vc_SignExtend_w32
+     [ passed ] Test ( signExtend(16'h0fff) ) succeeded, [ 00000fff == 00000fff ]
+     [ passed ] Test ( signExtend(16'hffff) ) succeeded, [ ffffffff == ffffffff ]
+
+../vc/vc-Arith.t.v:135: $finish called at 355 (1s)

@@ -1,0 +1,59 @@
+VCD info: dumpfile dump.vcd opened for output.
+
+ Entering Test Suite: riscv-CoreDpathPipeMulDiv
+  + Running Test Case: mul
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000000 == 0000000000000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000001 == 0000000000000001 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffffffffffffff == ffffffffffffffff ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffffffffffffff == ffffffffffffffff ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000001 == 0000000000000001 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000018 == 0000000000000018 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffffffffffffc0 == ffffffffffffffc0 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000040 == 0000000000000040 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 00deadbee0000000 == 00deadbee0000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ fdeadbeef0000000 == fdeadbeef0000000 ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+  + Running Test Case: div/rem
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000000 == 0000000000000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000001 == 0000000000000001 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000000 == 0000000000000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000001 == 0000000000000001 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 000000000000000d == 000000000000000d ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 00000000ffffdf76 == 00000000ffffdf76 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000003200000000 == 0000003200000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000002e0000000a == 0000002e0000000a ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 00003372ffffdf75 == 00003372ffffdf75 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffda72ffffd353 == ffffda72ffffd353 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffcc8effffdf75 == ffffcc8effffdf75 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffcc8e0000208b == ffffcc8e0000208b ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+  + Running Test Case: divu/remu
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000000 == 0000000000000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000001 == 0000000000000001 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000000 == 0000000000000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000001 == 0000000000000001 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 000000000000000d == 000000000000000d ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 000000000000208a == 000000000000208a ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000003200000000 == 0000003200000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000002e0000000a == 0000002e0000000a ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0a01b04400000000 == 0a01b04400000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000227f00012a90 == 0000227f00012a90 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 000006f000032012 == 000006f000032012 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ f5fe4fbc00000000 == f5fe4fbc00000000 ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+  + Running Test Case: mixed
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffffffffffffc0 == ffffffffffffffc0 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000000000000040 == 0000000000000040 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 00deadbee0000000 == 00deadbee0000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ fdeadbeef0000000 == fdeadbeef0000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 00003372ffffdf75 == 00003372ffffdf75 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffda72ffffd353 == ffffda72ffffd353 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffcc8effffdf75 == ffffcc8effffdf75 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ ffffcc8e0000208b == ffffcc8e0000208b ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0a01b04400000000 == 0a01b04400000000 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 0000227f00012a90 == 0000227f00012a90 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ 000006f000032012 == 000006f000032012 ]
+     [ passed ] Test ( vc-TestSink ) succeeded, [ f5fe4fbc00000000 == f5fe4fbc00000000 ]
+     [ passed ] Test ( Is sink finished? ) succeeded 
+
+../riscvlong/riscvlong-CoreDpathPipeMulDiv.t.v:210: $finish called at 40245 (1s)
