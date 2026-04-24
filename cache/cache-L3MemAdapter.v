@@ -156,10 +156,10 @@ module cache_L3MemAdapter
       end
 
       STATE_WRITE_RESP: begin
-        // Collect c_words_per_line write acks.
-        if (memresp_val && word_cnt == c_words_per_line-1) begin
+        // All acks already collected during WRITE_REQ, or last one arrives now.
+        if (resp_cnt >= c_words_per_line ||
+            (resp_cnt == c_words_per_line-1 && memresp_val))
           state_next = lat_has_refill ? STATE_READ_REQ : STATE_DONE;
-        end
       end
 
       STATE_READ_REQ: begin
@@ -221,10 +221,11 @@ module cache_L3MemAdapter
   );
 
   assign memreq_val  = (state_reg == STATE_WRITE_REQ || state_reg == STATE_READ_REQ);
-  // Also accept responses during STATE_READ_REQ so rand-delay buffer never fills
-  // and backpressure (memreq_rdy=0) cannot deadlock the request-issue loop.
-  assign memresp_rdy = (state_reg == STATE_WRITE_RESP ||
-                        state_reg == STATE_READ_REQ   ||
+  // Assert memresp_rdy in all four active states so the rand-delay buffer never
+  // fills and memreq_rdy (= mem's memresp_rdy) stays high during both request loops.
+  assign memresp_rdy = (state_reg == STATE_WRITE_REQ  ||
+                        state_reg == STATE_WRITE_RESP  ||
+                        state_reg == STATE_READ_REQ    ||
                         state_reg == STATE_READ_RESP);
   assign dn_req_rdy  = (state_reg == STATE_IDLE);
 
@@ -253,7 +254,7 @@ module cache_L3MemAdapter
       lat_victim_data  <= {c_line_bits{1'b0}};
     end else begin
 
-      // Latch SWAP request on entry from IDLE
+      // Latch SWAP request on entry from IDLE; reset both counters for the new txn.
       if (state_reg == STATE_IDLE && dn_req_val) begin
         lat_has_refill   <= req_has_refill;
         lat_has_victim   <= req_has_victim;
@@ -262,37 +263,37 @@ module cache_L3MemAdapter
         lat_victim_addr  <= req_victim_addr;
         lat_victim_data  <= req_victim_data;
         word_cnt         <= {c_word_cnt_sz{1'b0}};
+        resp_cnt         <= {c_word_cnt_sz{1'b0}};
       end
 
-      // Advance word counter on each accepted write request (not at last word)
+      // WRITE_REQ: advance request counter (address generation), not past last word
       if (state_reg == STATE_WRITE_REQ && memreq_rdy && word_cnt != c_words_per_line-1)
         word_cnt <= word_cnt + 1'b1;
 
-      // Reset counter when entering WRITE_RESP (start collecting acks from 0)
-      if (state_reg == STATE_WRITE_REQ && state_next == STATE_WRITE_RESP)
-        word_cnt <= {c_word_cnt_sz{1'b0}};
-
-      // Advance counter on each received write ack (not at last ack)
-      if (state_reg == STATE_WRITE_RESP && memresp_val && word_cnt != c_words_per_line-1)
-        word_cnt <= word_cnt + 1'b1;
-
-      // Reset both counters when entering READ_REQ
-      if (state_next == STATE_READ_REQ && state_reg != STATE_READ_REQ) begin
-        word_cnt <= {c_word_cnt_sz{1'b0}};
-        resp_cnt <= {c_word_cnt_sz{1'b0}};
-      end
-
-      // READ_REQ: advance request counter (for address generation), not past last word
+      // READ_REQ: advance request counter (address generation), not past last word
       if (state_reg == STATE_READ_REQ && memreq_rdy && word_cnt != c_words_per_line-1)
         word_cnt <= word_cnt + 1'b1;
 
-      // Assemble line_buf from read responses in both READ_REQ and READ_RESP.
-      // Using resp_cnt (independent of word_cnt) prevents deadlock: memresp_rdy=1
-      // during READ_REQ keeps the rand-delay buffer draining so memreq_rdy stays high.
+      // Count write acks in both WRITE_REQ and WRITE_RESP.
+      // memresp_rdy=1 in WRITE_REQ drains the rand-delay buffer so memreq_rdy stays high.
+      if ((state_reg == STATE_WRITE_REQ || state_reg == STATE_WRITE_RESP) &&
+           memresp_val && resp_cnt < c_words_per_line)
+        resp_cnt <= resp_cnt + 1'b1;
+
+      // Collect read responses in both READ_REQ and READ_RESP into line_buf.
+      // memresp_rdy=1 in READ_REQ drains the rand-delay buffer so memreq_rdy stays high.
       if ((state_reg == STATE_READ_REQ || state_reg == STATE_READ_RESP) &&
            memresp_val && resp_cnt < c_words_per_line) begin
         line_buf[resp_cnt * p_data_sz +: p_data_sz] <= memresp_data;
         resp_cnt <= resp_cnt + 1'b1;
+      end
+
+      // Reset both counters when entering READ_REQ from another state (e.g. WRITE_RESP).
+      // Placed AFTER the ack/response collection so this reset wins over any simultaneous
+      // final-ack increment on the WRITE_RESP → READ_REQ transition cycle.
+      if (state_next == STATE_READ_REQ && state_reg != STATE_READ_REQ) begin
+        word_cnt <= {c_word_cnt_sz{1'b0}};
+        resp_cnt <= {c_word_cnt_sz{1'b0}};
       end
 
       // Reset counters on DONE → IDLE
