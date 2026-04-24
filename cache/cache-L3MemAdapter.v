@@ -104,7 +104,8 @@ module cache_L3MemAdapter
   // Word counter and line buffer
   //----------------------------------------------------------------------
 
-  reg [c_word_cnt_sz-1:0] word_cnt;
+  reg [c_word_cnt_sz-1:0] word_cnt;   // request counter (address generation)
+  reg [c_word_cnt_sz-1:0] resp_cnt;  // response counter (line_buf assembly)
   reg [c_line_bits-1:0]   line_buf;  // assembled from READ responses
 
   //----------------------------------------------------------------------
@@ -168,8 +169,10 @@ module cache_L3MemAdapter
       end
 
       STATE_READ_RESP: begin
-        // Collect and assemble c_words_per_line words into line_buf.
-        if (memresp_val && word_cnt == c_words_per_line-1)
+        // Collect remaining words; also handles the case where all responses
+        // already arrived during STATE_READ_REQ (resp_cnt == c_words_per_line).
+        if (resp_cnt >= c_words_per_line ||
+            (resp_cnt == c_words_per_line-1 && memresp_val))
           state_next = STATE_DONE;
       end
 
@@ -218,7 +221,11 @@ module cache_L3MemAdapter
   );
 
   assign memreq_val  = (state_reg == STATE_WRITE_REQ || state_reg == STATE_READ_REQ);
-  assign memresp_rdy = (state_reg == STATE_WRITE_RESP || state_reg == STATE_READ_RESP);
+  // Also accept responses during STATE_READ_REQ so rand-delay buffer never fills
+  // and backpressure (memreq_rdy=0) cannot deadlock the request-issue loop.
+  assign memresp_rdy = (state_reg == STATE_WRITE_RESP ||
+                        state_reg == STATE_READ_REQ   ||
+                        state_reg == STATE_READ_RESP);
   assign dn_req_rdy  = (state_reg == STATE_IDLE);
 
   //----------------------------------------------------------------------
@@ -236,6 +243,7 @@ module cache_L3MemAdapter
   always @(posedge clk) begin
     if (reset) begin
       word_cnt       <= {c_word_cnt_sz{1'b0}};
+      resp_cnt       <= {c_word_cnt_sz{1'b0}};
       line_buf       <= {c_line_bits{1'b0}};
       lat_has_refill   <= 1'b0;
       lat_has_victim   <= 1'b0;
@@ -268,28 +276,30 @@ module cache_L3MemAdapter
       if (state_reg == STATE_WRITE_RESP && memresp_val && word_cnt != c_words_per_line-1)
         word_cnt <= word_cnt + 1'b1;
 
-      // Reset counter when entering READ_REQ
-      if (state_next == STATE_READ_REQ && state_reg != STATE_READ_REQ)
+      // Reset both counters when entering READ_REQ
+      if (state_next == STATE_READ_REQ && state_reg != STATE_READ_REQ) begin
         word_cnt <= {c_word_cnt_sz{1'b0}};
+        resp_cnt <= {c_word_cnt_sz{1'b0}};
+      end
 
-      // Advance counter on each accepted read request (not at last word)
+      // READ_REQ: advance request counter (for address generation), not past last word
       if (state_reg == STATE_READ_REQ && memreq_rdy && word_cnt != c_words_per_line-1)
         word_cnt <= word_cnt + 1'b1;
 
-      // Reset counter when entering READ_RESP
-      if (state_reg == STATE_READ_REQ && state_next == STATE_READ_RESP)
-        word_cnt <= {c_word_cnt_sz{1'b0}};
-
-      // Assemble line_buf from read responses; advance counter
-      if (state_reg == STATE_READ_RESP && memresp_val) begin
-        line_buf[word_cnt * p_data_sz +: p_data_sz] <= memresp_data;
-        if (word_cnt != c_words_per_line-1)
-          word_cnt <= word_cnt + 1'b1;
+      // Assemble line_buf from read responses in both READ_REQ and READ_RESP.
+      // Using resp_cnt (independent of word_cnt) prevents deadlock: memresp_rdy=1
+      // during READ_REQ keeps the rand-delay buffer draining so memreq_rdy stays high.
+      if ((state_reg == STATE_READ_REQ || state_reg == STATE_READ_RESP) &&
+           memresp_val && resp_cnt < c_words_per_line) begin
+        line_buf[resp_cnt * p_data_sz +: p_data_sz] <= memresp_data;
+        resp_cnt <= resp_cnt + 1'b1;
       end
 
-      // Reset counter on DONE → IDLE
-      if (state_reg == STATE_DONE && dn_resp_rdy)
+      // Reset counters on DONE → IDLE
+      if (state_reg == STATE_DONE && dn_resp_rdy) begin
         word_cnt <= {c_word_cnt_sz{1'b0}};
+        resp_cnt <= {c_word_cnt_sz{1'b0}};
+      end
 
     end
   end
