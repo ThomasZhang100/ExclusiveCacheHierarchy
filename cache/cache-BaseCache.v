@@ -231,6 +231,7 @@ module cache_BaseCache
     .refill_addr            (up_refill_addr),
     .up_req_wdata           ({p_data_sz{1'b0}}),
     .up_req_type            (1'b0),
+    .up_req_len             (2'b0),
     .up_resp_rdata          (up_resp_rdata),
 
     .incoming_victim_addr   (up_victim_addr),

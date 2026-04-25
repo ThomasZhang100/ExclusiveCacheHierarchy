@@ -18,6 +18,7 @@ module cache_BaseCacheDpath
   input  [p_addr_sz-1:0]  refill_addr,
   input  [p_data_sz-1:0]  up_req_wdata,
   input                   up_req_type,
+  input  [1:0]            up_req_len,    // 0=word, 1=byte, 2=halfword
   output [p_data_sz-1:0]  up_resp_rdata,
 
   input  [p_addr_sz-1:0]  incoming_victim_addr,
@@ -142,22 +143,30 @@ module cache_BaseCacheDpath
   always @(posedge clk) begin
     for (j = 0; j < p_num_ways; j = j + 1) begin
       if (refill_data_wen[j]) begin
-        // Write-allocate: merge store word into refill line when marking dirty
+        // Write-allocate: merge store bytes into refill line when marking dirty
         if (mark_dirty) begin
           data_array[req_set_idx][j] <= refill_line;
-          // Overwrite the specific word with CPU store data
-          // (done in two steps since Verilog can't index with variable slice in one assign)
-          data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz +: p_data_sz]
-            <= up_req_wdata;
+          if (up_req_len == 2'd1)
+            data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz + req_offset[1:0]*8 +: 8]  <= up_req_wdata[7:0];
+          else if (up_req_len == 2'd2)
+            data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz + req_offset[1:0]*8 +: 16] <= up_req_wdata[15:0];
+          else
+            data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz +: p_data_sz] <= up_req_wdata;
         end else begin
           data_array[req_set_idx][j] <= refill_line;
         end
       end
       if (victim_data_wen[j])
         data_array[vic_set_idx][j] <= incoming_victim_data;
-      // Store hit: overwrite only the target word within the hit line
-      if (store_hit_data_wen[j])
-        data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz +: p_data_sz] <= up_req_wdata;
+      // Store hit: overwrite only the target byte(s) within the hit line
+      if (store_hit_data_wen[j]) begin
+        if (up_req_len == 2'd1)
+          data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz + req_offset[1:0]*8 +: 8]  <= up_req_wdata[7:0];
+        else if (up_req_len == 2'd2)
+          data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz + req_offset[1:0]*8 +: 16] <= up_req_wdata[15:0];
+        else
+          data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz +: p_data_sz] <= up_req_wdata;
+      end
     end
   end
 
@@ -350,7 +359,7 @@ module cache_BaseCacheDpath
   wire [c_offset_sz-3:0]  word_idx = req_offset[c_offset_sz-1:2]; //req_offset[3:2]
 
   assign hit_line      = data_rd_refill[hit_way];
-  assign up_resp_rdata = hit_line[word_idx * p_data_sz +: p_data_sz];
+  assign up_resp_rdata = (hit_line[word_idx * p_data_sz +: p_data_sz]) >> (req_offset[1:0] * 8);
 
   //----------------------------------------------------------------------
   // Cache invalidation at reset

@@ -41,15 +41,17 @@ module cache_L1CacheCtrl
   output reg              up_req_rdy,   // deasserted to stall CPU pipeline
 
   input                   up_req_type,  // 0=read, 1=write (store)
+  input  [1:0]            up_req_len,   // 0=word, 1=byte, 2=halfword
   input  [p_addr_sz-1:0]  up_req_addr,
   input  [p_data_sz-1:0]  up_req_wdata,
 
   output reg              up_resp_val,  // one-cycle pulse when data is ready
 
-  // Expose latched request address for stable word extraction in dpath
+  // Expose latched request fields for stable extraction in dpath
   output [p_addr_sz-1:0]  req_addr_lat_out,
   output [p_data_sz-1:0]  req_wdata_lat_out,
   output                  req_type_lat_out,
+  output [1:0]            req_len_lat_out,
 
   //----------------------------------------------------------------------
   // Downstream: SWAP message interface (to L2 via arbiter)
@@ -116,22 +118,26 @@ module cache_L1CacheCtrl
   //----------------------------------------------------------------------
 
   reg                  req_type_lat;
+  reg [1:0]            req_len_lat;
   reg [p_addr_sz-1:0]  req_addr_lat;
   reg [p_data_sz-1:0]  req_wdata_lat;
 
-  assign req_addr_lat_out = req_addr_lat;
+  assign req_addr_lat_out  = req_addr_lat;
   assign req_wdata_lat_out = req_wdata_lat;
-  assign req_type_lat_out = req_type_lat;
+  assign req_type_lat_out  = req_type_lat;
+  assign req_len_lat_out   = req_len_lat;
 
   localparam c_offset_sz = $clog2(p_line_sz);
 
   always @(posedge clk) begin
     if (reset) begin
       req_type_lat  <= 1'b0;
+      req_len_lat   <= 2'b0;
       req_addr_lat  <= {p_addr_sz{1'b0}};
       req_wdata_lat <= {p_data_sz{1'b0}};
     end else if (up_req_val && up_req_rdy) begin
       req_type_lat  <= up_req_type;
+      req_len_lat   <= up_req_len;
       req_addr_lat  <= up_req_addr;
       req_wdata_lat <= up_req_wdata;
     end
