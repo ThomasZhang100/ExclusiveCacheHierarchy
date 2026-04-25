@@ -47,9 +47,9 @@ module cache_L1CacheCtrl
   output reg              up_resp_val,  // one-cycle pulse when data is ready
 
   // Expose latched request address for stable word extraction in dpath
-  output reg [p_addr_sz-1:0] req_addr_lat_out,
-  output reg [p_addr_sz-1:0] req_wdata_lat_out,
-  output reg [p_addr_sz-1:0] req_type_lat_out,
+  output [p_addr_sz-1:0]  req_addr_lat_out,
+  output [p_data_sz-1:0]  req_wdata_lat_out,
+  output                  req_type_lat_out,
 
   //----------------------------------------------------------------------
   // Downstream: SWAP message interface (to L2 via arbiter)
