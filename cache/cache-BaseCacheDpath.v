@@ -366,6 +366,12 @@ module cache_BaseCacheDpath
   //----------------------------------------------------------------------
 
   integer si, wi;
+  initial begin
+    for (si = 0; si < p_num_sets; si = si + 1)
+      for (wi = 0; wi < p_num_ways; wi = wi + 1)
+        tag_array[si][wi] = {c_tag_entry_sz{1'b0}};
+  end
+
   always @(posedge clk) begin
     if (reset) begin
       for (si = 0; si < p_num_sets; si = si + 1)
