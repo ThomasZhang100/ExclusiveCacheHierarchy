@@ -261,8 +261,8 @@ module cache_BaseCacheDpath
     end
   end
 
-  assign refill_lru_way = refill_lru_way_r;
-  assign victim_lru_way = victim_lru_way_r;
+  assign refill_lru_way = (p_num_ways > 1) ? refill_lru_way_r : {c_way_bits{1'b0}};
+  assign victim_lru_way = (p_num_ways > 1) ? victim_lru_way_r : {c_way_bits{1'b0}};
 
   // ---- Update: flip bits along the path to the accessed way -------------
 
