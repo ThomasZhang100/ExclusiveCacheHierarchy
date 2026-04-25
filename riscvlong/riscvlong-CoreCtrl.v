@@ -718,7 +718,8 @@ module riscv_CoreCtrl
 
   always @ ( posedge clk ) begin
     if ( reset ) begin
-      bubble_Mhl <= 1'b1;
+      bubble_Mhl      <= 1'b1;
+      dmemreq_val_Mhl <= 1'b0;
     end
     else if( !stall_Mhl ) begin
       ir_Mhl               <= ir_Xhl;
@@ -728,13 +729,18 @@ module riscv_CoreCtrl
       rf_waddr_Mhl         <= rf_waddr_Xhl;
       csr_wen_Mhl          <= csr_wen_Xhl;
       csr_addr_Mhl         <= csr_addr_Xhl;
-			
+
 			muldiv_mux_sel_Mhl   <= muldiv_mux_sel_Xhl;
       execute_mux_sel_Mhl  <= execute_mux_sel_Xhl;
-      
+
       bubble_Mhl           <= bubble_next_Xhl;
+      dmemreq_val_Mhl      <= dmemreq_val;
     end
-    dmemreq_val_Mhl <= dmemreq_val;
+    else if ( dmemresp_val ) begin
+      // Response arrived while M is stalled by imem: clear the pending flag so
+      // stall_dmem_Mhl drops. The response is captured by dmemresp_queue_en_Mhl.
+      dmemreq_val_Mhl <= 1'b0;
+    end
   end
 
   //----------------------------------------------------------------------
