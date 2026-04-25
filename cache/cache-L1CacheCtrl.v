@@ -79,6 +79,7 @@ module cache_L1CacheCtrl
   output reg              refill_invalidate,    // (unused in L1 miss path; for completeness)
   output reg              mark_dirty,           // write-allocate: store after refill
   output reg              lru_update_refill_en, // update LRU after hit or refill
+  output reg              store_hit_wen_en,     // store hit: write word into hit line
 
   //----------------------------------------------------------------------
   // Dpath status inputs
@@ -230,6 +231,7 @@ module cache_L1CacheCtrl
     refill_invalidate    = 1'b0;
     mark_dirty           = 1'b0;
     lru_update_refill_en = 1'b0;
+    store_hit_wen_en     = 1'b0;
 
     case (state_reg)
 
@@ -238,7 +240,10 @@ module cache_L1CacheCtrl
       end
 
       STATE_TAG_CHECK: begin
-        // SRAM read in progress; nothing to drive.
+        // For a store hit, write the store word into the cache line and mark
+        // dirty now (synchronous write fires on the TAG_CHECK→RESP edge).
+        if (hit && req_type_lat)
+          store_hit_wen_en = 1'b1;
       end
 
       STATE_HIT_WAIT: begin

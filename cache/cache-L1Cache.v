@@ -80,6 +80,7 @@ module cache_L1Cache
   wire                  refill_invalidate;
   wire                  mark_dirty;
   wire                  lru_update_refill_en;
+  wire                  store_hit_wen_en;
 
   wire                  ctrl_dn_req_has_victim;
   wire                  ctrl_dn_req_has_refill;
@@ -135,6 +136,7 @@ module cache_L1Cache
     .refill_invalidate    (refill_invalidate),
     .mark_dirty           (mark_dirty),
     .lru_update_refill_en (lru_update_refill_en),
+    .store_hit_wen_en     (store_hit_wen_en),
 
     .hit                  (hit),
     .refill_evict_valid   (refill_evict_valid),
@@ -151,16 +153,19 @@ module cache_L1Cache
   reg [p_num_ways-1:0] refill_tag_wen_oh;
   reg [p_num_ways-1:0] refill_data_wen_oh;
   reg [p_num_ways-1:0] refill_inv_oh;
+  reg [p_num_ways-1:0] store_hit_data_wen_oh;
 
   integer w;
   always @(*) begin
-    refill_tag_wen_oh  = {p_num_ways{1'b0}};
-    refill_data_wen_oh = {p_num_ways{1'b0}};
-    refill_inv_oh      = {p_num_ways{1'b0}};
+    refill_tag_wen_oh    = {p_num_ways{1'b0}};
+    refill_data_wen_oh   = {p_num_ways{1'b0}};
+    refill_inv_oh        = {p_num_ways{1'b0}};
+    store_hit_data_wen_oh = {p_num_ways{1'b0}};
     for (w = 0; w < p_num_ways; w = w + 1) begin
-      if (refill_tag_wen_en  && w == refill_lru_way) refill_tag_wen_oh[w]  = 1'b1;
-      if (refill_data_wen_en && w == refill_lru_way) refill_data_wen_oh[w] = 1'b1;
-      if (refill_invalidate  && w == hit_way)         refill_inv_oh[w]      = 1'b1;
+      if (refill_tag_wen_en   && w == refill_lru_way) refill_tag_wen_oh[w]    = 1'b1;
+      if (refill_data_wen_en  && w == refill_lru_way) refill_data_wen_oh[w]   = 1'b1;
+      if (refill_invalidate   && w == hit_way)         refill_inv_oh[w]        = 1'b1;
+      if (store_hit_wen_en    && w == hit_way)         store_hit_data_wen_oh[w] = 1'b1;
     end
   end
 
@@ -221,6 +226,7 @@ module cache_L1Cache
     .refill_line            (dn_resp_refill_line),
     .refill_invalidate_way  (refill_inv_oh),
     .mark_dirty             (mark_dirty),
+    .store_hit_data_wen     (store_hit_data_wen_oh),
 
     .victim_tag_wen         ({p_num_ways{1'b0}}),
     .victim_data_wen        ({p_num_ways{1'b0}}),

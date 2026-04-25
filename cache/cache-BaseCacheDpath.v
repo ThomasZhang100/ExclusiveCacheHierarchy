@@ -27,6 +27,7 @@ module cache_BaseCacheDpath
   input  [p_line_sz*8-1:0] refill_line,
   input  [p_num_ways-1:0] refill_invalidate_way,
   input                   mark_dirty,
+  input  [p_num_ways-1:0] store_hit_data_wen,   // store hit: update word in hit way
 
   input  [p_num_ways-1:0] victim_tag_wen,
   input  [p_num_ways-1:0] victim_data_wen,
@@ -114,6 +115,9 @@ module cache_BaseCacheDpath
       // Victim-set: evict V3 before placing V
       if (victim_set_evict_way[i])
         tag_array[vic_set_idx][i][c_tag_entry_sz-2] <= 1'b0; // clear valid
+      // Store hit: mark the hit line dirty without changing tag or valid
+      if (store_hit_data_wen[i])
+        tag_array[req_set_idx][i][c_tag_entry_sz-1] <= 1'b1;
     end
   end
 
@@ -151,6 +155,9 @@ module cache_BaseCacheDpath
       end
       if (victim_data_wen[j])
         data_array[vic_set_idx][j] <= incoming_victim_data;
+      // Store hit: overwrite only the target word within the hit line
+      if (store_hit_data_wen[j])
+        data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz +: p_data_sz] <= up_req_wdata;
     end
   end
 
