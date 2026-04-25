@@ -340,7 +340,7 @@ module cache_BaseCacheDpath
   // CPU word extraction
   //----------------------------------------------------------------------
 
-  wire [c_way_bits-1:0]  word_idx = req_offset[c_offset_sz-1:2];
+  wire [c_offset_sz-3:0]  word_idx = req_offset[c_offset_sz-1:2]; //req_offset[3:2]
 
   assign hit_line      = data_rd_refill[hit_way];
   assign up_resp_rdata = hit_line[word_idx * p_data_sz +: p_data_sz];
