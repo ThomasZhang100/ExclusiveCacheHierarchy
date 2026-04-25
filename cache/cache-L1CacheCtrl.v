@@ -46,6 +46,11 @@ module cache_L1CacheCtrl
 
   output reg              up_resp_val,  // one-cycle pulse when data is ready
 
+  // Expose latched request address for stable word extraction in dpath
+  output reg [p_addr_sz-1:0] req_addr_lat_out,
+  output reg [p_addr_sz-1:0] req_wdata_lat_out,
+  output reg [p_addr_sz-1:0] req_type_lat_out,
+
   //----------------------------------------------------------------------
   // Downstream: SWAP message interface (to L2 via arbiter)
   // See cache-SwapMsg.vh for message layout.
@@ -112,6 +117,10 @@ module cache_L1CacheCtrl
   reg                  req_type_lat;
   reg [p_addr_sz-1:0]  req_addr_lat;
   reg [p_data_sz-1:0]  req_wdata_lat;
+
+  assign req_addr_lat_out = req_addr_lat;
+  assign req_wdata_lat_out = req_wdata_lat;
+  assign req_type_lat_out = req_type_lat;
 
   localparam c_offset_sz = $clog2(p_line_sz);
 

@@ -116,6 +116,10 @@ module cache_L1Cache
     .up_req_wdata         (req_wdata),
     .up_resp_val          (ctrl_up_resp_val),
 
+    .req_addr_lat_out     (req_addr_lat),
+    .req_wdata_lat_out    (req_wdata_lat),
+    .req_type_lat_out     (req_type_lat),
+
     .dn_req_val           (ctrl_dn_req_val),
     .dn_req_rdy           (dn_req_rdy),
     .dn_req_has_victim    (ctrl_dn_req_has_victim),
@@ -203,9 +207,9 @@ module cache_L1Cache
     .clk                    (clk),
     .reset                  (reset),
 
-    .refill_addr            (req_addr),
-    .up_req_wdata           (req_wdata),
-    .up_req_type            (req_type),
+    .refill_addr            (req_addr_lat),
+    .up_req_wdata           (req_wdata_lat),
+    .up_req_type            (req_type_lat),
     .up_resp_rdata          (up_resp_rdata),
 
     .incoming_victim_addr   ({p_addr_sz{1'b0}}),
