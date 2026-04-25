@@ -733,8 +733,8 @@ module riscv_CoreCtrl
       execute_mux_sel_Mhl  <= execute_mux_sel_Xhl;
       
       bubble_Mhl           <= bubble_next_Xhl;
+      dmemreq_val_Mhl <= dmemreq_val;
     end
-    dmemreq_val_Mhl <= dmemreq_val;
   end
 
   //----------------------------------------------------------------------
