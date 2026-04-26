@@ -138,24 +138,27 @@ module cache_BaseCacheDpath
     end
   endgenerate
 
+  // Pre-compute write-allocate merged line combinatorially to avoid overlapping
+  // non-blocking assignments to the same 2D array element in Icarus Verilog.
+  reg [c_line_bits-1:0] wa_merged_line;
+  always @(*) begin
+    wa_merged_line = refill_line;
+    if (mark_dirty) begin
+      if (up_req_len == 2'd1)
+        wa_merged_line[req_offset[c_offset_sz-1:2]*p_data_sz + req_offset[1:0]*8 +: 8]  = up_req_wdata[7:0];
+      else if (up_req_len == 2'd2)
+        wa_merged_line[req_offset[c_offset_sz-1:2]*p_data_sz + req_offset[1:0]*8 +: 16] = up_req_wdata[15:0];
+      else
+        wa_merged_line[req_offset[c_offset_sz-1:2]*p_data_sz +: p_data_sz] = up_req_wdata;
+    end
+  end
+
   // Synchronous data writes
   integer j;
   always @(posedge clk) begin
     for (j = 0; j < p_num_ways; j = j + 1) begin
-      if (refill_data_wen[j]) begin
-        // Write-allocate: merge store bytes into refill line when marking dirty
-        if (mark_dirty) begin
-          data_array[req_set_idx][j] <= refill_line;
-          if (up_req_len == 2'd1)
-            data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz + req_offset[1:0]*8 +: 8]  <= up_req_wdata[7:0];
-          else if (up_req_len == 2'd2)
-            data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz + req_offset[1:0]*8 +: 16] <= up_req_wdata[15:0];
-          else
-            data_array[req_set_idx][j][req_offset[c_offset_sz-1:2]*p_data_sz +: p_data_sz] <= up_req_wdata;
-        end else begin
-          data_array[req_set_idx][j] <= refill_line;
-        end
-      end
+      if (refill_data_wen[j])
+        data_array[req_set_idx][j] <= wa_merged_line;
       if (victim_data_wen[j])
         data_array[vic_set_idx][j] <= incoming_victim_data;
       // Store hit: overwrite only the target byte(s) within the hit line
