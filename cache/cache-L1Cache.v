@@ -230,6 +230,7 @@ module cache_L1Cache
     .refill_line            (dn_resp_refill_line),
     .refill_invalidate_way  (refill_inv_oh),
     .mark_dirty             (mark_dirty),
+    .inplace_swap           (1'b0),
     .store_hit_data_wen     (store_hit_data_wen_oh),
 
     .victim_tag_wen         ({p_num_ways{1'b0}}),

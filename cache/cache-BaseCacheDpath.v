@@ -28,6 +28,7 @@ module cache_BaseCacheDpath
   input  [p_line_sz*8-1:0] refill_line,
   input  [p_num_ways-1:0] refill_invalidate_way,
   input                   mark_dirty,
+  input                   inplace_swap,         // 1: refill_tag_wen writes victim fields
   input  [p_num_ways-1:0] store_hit_data_wen,   // store hit: update word in hit way
 
   input  [p_num_ways-1:0] victim_tag_wen,
@@ -104,9 +105,13 @@ module cache_BaseCacheDpath
   integer i;
   always @(posedge clk) begin
     for (i = 0; i < p_num_ways; i = i + 1) begin
-      // Refill-set: write new tag (refill or inplace-swap)
+      // Refill-set: write new tag.
+      // inplace_swap=1: V1 (incoming victim) takes A's slot — must use V1's tag/dirty.
+      // inplace_swap=0: normal miss refill — use req_tag and mark_dirty.
       if (refill_tag_wen[i])
-        tag_array[req_set_idx][i] <= {mark_dirty, 1'b1, req_tag};
+        tag_array[req_set_idx][i] <= inplace_swap
+          ? {incoming_victim_dirty, 1'b1, vic_tag}
+          : {mark_dirty, 1'b1, req_tag};
       // Refill-set: invalidate (line leaving upward to L1)
       if (refill_invalidate_way[i])
         tag_array[req_set_idx][i][c_tag_entry_sz-2] <= 1'b0; // clear valid

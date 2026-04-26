@@ -243,6 +243,7 @@ module cache_BaseCache
     .refill_line            (refill_line_mux),
     .refill_invalidate_way  (refill_inv_oh),
     .mark_dirty             (mark_dirty),
+    .inplace_swap           (inplace_swap),
     .store_hit_data_wen     ({p_num_ways{1'b0}}),
 
     .victim_tag_wen         (victim_tag_wen_oh),
