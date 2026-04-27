@@ -94,11 +94,25 @@ module cache_L1Cache
   wire                  refill_evict_dirty;
   wire                  refill_evict_valid;
 
-  // Latched request inside ctrl; expose needed fields
-  wire req_type_lat;
-  wire [1:0]            req_len_lat;
-  wire [p_addr_sz-1:0] req_addr_lat;
-  wire [p_data_sz-1:0] req_wdata_lat;
+  // Latched request fields — registered here, fed to ctrl and dpath
+  reg                  req_type_lat;
+  reg [1:0]            req_len_lat;
+  reg [p_addr_sz-1:0]  req_addr_lat;
+  reg [p_data_sz-1:0]  req_wdata_lat;
+
+  always @(posedge clk) begin
+    if (reset) begin
+      req_type_lat  <= 1'b0;
+      req_len_lat   <= 2'b0;
+      req_addr_lat  <= {p_addr_sz{1'b0}};
+      req_wdata_lat <= {p_data_sz{1'b0}};
+    end else if (up_req_val && ctrl_up_req_rdy) begin
+      req_type_lat  <= req_type;
+      req_len_lat   <= req_len;
+      req_addr_lat  <= req_addr;
+      req_wdata_lat <= req_wdata;
+    end
+  end
 
   cache_L1CacheCtrl #(
     .p_num_sets (p_num_sets),
@@ -113,16 +127,9 @@ module cache_L1Cache
 
     .up_req_val           (up_req_val),
     .up_req_rdy           (ctrl_up_req_rdy),
-    .up_req_type          (req_type),
-    .up_req_len           (req_len),
-    .up_req_addr          (req_addr),
-    .up_req_wdata         (req_wdata),
+    .req_addr_lat         (req_addr_lat),
+    .req_type_lat         (req_type_lat),
     .up_resp_val          (ctrl_up_resp_val),
-
-    .req_addr_lat_out     (req_addr_lat),
-    .req_wdata_lat_out    (req_wdata_lat),
-    .req_type_lat_out     (req_type_lat),
-    .req_len_lat_out      (req_len_lat),
 
     .dn_req_val           (ctrl_dn_req_val),
     .dn_req_rdy           (dn_req_rdy),

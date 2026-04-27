@@ -121,10 +121,8 @@ module cache_BaseCache
 
     .up_req_val              (up_req_val),
     .up_req_rdy              (ctrl_up_req_rdy),
-    .up_req_has_victim       (up_has_victim),
-    .up_req_has_refill       (up_has_refill),
-    .up_req_victim_addr      (up_victim_addr),
-    .up_req_refill_addr      (up_refill_addr),
+    .lat_has_victim          (lat_has_victim),
+    .lat_refill_addr         (lat_refill_addr),
     .up_resp_val             (ctrl_up_resp_val),
     .up_resp_rdy             (up_resp_rdy),
 
@@ -161,6 +159,33 @@ module cache_BaseCache
 
   assign up_req_rdy  = ctrl_up_req_rdy;
   assign up_resp_val = ctrl_up_resp_val;
+
+  //----------------------------------------------------------------------
+  // Latch upstream SWAP request fields for stable dpath use
+  // (same pattern as L1Cache latching req_addr_lat etc. from its ctrl)
+  //----------------------------------------------------------------------
+
+  reg                   lat_has_victim;
+  reg [p_addr_sz-1:0]   lat_refill_addr;
+  reg [p_addr_sz-1:0]   lat_victim_addr;
+  reg                   lat_victim_dirty;
+  reg [c_line_bits-1:0] lat_victim_data;
+
+  always @(posedge clk) begin
+    if (reset) begin
+      lat_has_victim   <= 1'b0;
+      lat_refill_addr  <= {p_addr_sz{1'b0}};
+      lat_victim_addr  <= {p_addr_sz{1'b0}};
+      lat_victim_dirty <= 1'b0;
+      lat_victim_data  <= {c_line_bits{1'b0}};
+    end else if (up_req_val && ctrl_up_req_rdy) begin
+      lat_has_victim   <= up_has_victim;
+      lat_refill_addr  <= up_refill_addr;
+      lat_victim_addr  <= up_victim_addr;
+      lat_victim_dirty <= up_victim_dirty;
+      lat_victim_data  <= up_victim_data;
+    end
+  end
 
   //----------------------------------------------------------------------
   // One-hot way decoders
@@ -210,7 +235,7 @@ module cache_BaseCache
   // inplace_swap=0: write downstream refill data (normal miss path)
   //----------------------------------------------------------------------
 
-  wire [c_line_bits-1:0] refill_line_mux = inplace_swap ? up_victim_data : dn_refill_data;
+  wire [c_line_bits-1:0] refill_line_mux = inplace_swap ? lat_victim_data : dn_refill_data;
 
   //----------------------------------------------------------------------
   // Datapath
@@ -228,15 +253,15 @@ module cache_BaseCache
     .clk                    (clk),
     .reset                  (reset),
 
-    .refill_addr            (up_refill_addr),
+    .refill_addr            (lat_refill_addr),
     .up_req_wdata           ({p_data_sz{1'b0}}),
     .up_req_type            (1'b0),
     .up_req_len             (2'b0),
     .up_resp_rdata          (up_resp_rdata),
 
-    .incoming_victim_addr   (up_victim_addr),
-    .incoming_victim_data   (up_victim_data),
-    .incoming_victim_dirty  (up_victim_dirty),
+    .incoming_victim_addr   (lat_victim_addr),
+    .incoming_victim_data   (lat_victim_data),
+    .incoming_victim_dirty  (lat_victim_dirty),
 
     .refill_tag_wen         (refill_tag_wen_oh),
     .refill_data_wen        (refill_data_wen_oh),

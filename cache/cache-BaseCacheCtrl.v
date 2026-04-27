@@ -19,10 +19,9 @@ module cache_BaseCacheCtrl
   input                       up_req_val,
   output reg                  up_req_rdy,
 
-  input                       up_req_has_victim,
-  input                       up_req_has_refill,
-  input  [p_addr_sz-1:0]      up_req_victim_addr,
-  input  [p_addr_sz-1:0]      up_req_refill_addr,
+  // Latched SWAP request fields supplied by the enclosing BaseCache module
+  input                       lat_has_victim,
+  input  [p_addr_sz-1:0]      lat_refill_addr,
 
   output reg                  up_resp_val,
   input                       up_resp_rdy,
@@ -85,30 +84,15 @@ module cache_BaseCacheCtrl
   localparam c_hit_cnt_sz = $clog2(p_hit_lat > 1 ? p_hit_lat : 2);
   reg [c_hit_cnt_sz-1:0] hit_lat_cnt;
 
-  reg                  lat_has_victim;
-  reg                  lat_has_refill;
-  reg [p_addr_sz-1:0]  lat_victim_addr;
-  reg [p_addr_sz-1:0]  lat_refill_addr;
   // Set on a miss when victim_set was full: V3 (victim_set_evict_*) is piggybacked
   // onto the downstream SWAP as its victim instead of a separate EVICT_V_REQ.
   reg                  lat_v3_displaced;
 
   always @(posedge clk) begin
     if (reset) begin
-      lat_has_victim   <= 1'b0;
-      lat_has_refill   <= 1'b0;
-      lat_victim_addr  <= {p_addr_sz{1'b0}};
-      lat_refill_addr  <= {p_addr_sz{1'b0}};
       lat_v3_displaced <= 1'b0;
     end else begin
-      if (up_req_val && up_req_rdy) begin
-        lat_has_victim  <= up_req_has_victim;
-        lat_has_refill  <= up_req_has_refill;
-        lat_victim_addr <= up_req_victim_addr;
-        lat_refill_addr <= up_req_refill_addr;
-      end
-      // Latch whether V3 needs to be evicted from victim_set on a miss.
-      // victim_set_has_free is combinational from the dpath; capture it at TAG_CHECK.
+      // Capture at TAG_CHECK on a miss: victim_set_has_free is combinational from dpath.
       if (state_reg == STATE_TAG_CHECK && !hit)
         lat_v3_displaced <= lat_has_victim && !victim_set_has_free;
     end
