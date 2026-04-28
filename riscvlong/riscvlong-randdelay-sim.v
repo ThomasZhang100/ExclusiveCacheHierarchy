@@ -91,7 +91,7 @@ module riscv_sim;
     .p_mem_sz    (1<<20), // max 20-bit address to index into memory
     .p_addr_sz   (32),    // high order bits will get truncated in memory
     .p_data_sz   (32),
-    .p_max_delay (4)
+    .p_max_delay (16)
   )
   mem
   (
