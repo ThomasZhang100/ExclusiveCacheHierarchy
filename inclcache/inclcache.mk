@@ -5,15 +5,15 @@
 inclcache_deps =
 
 inclcache_srcs = \
-  cache-InclMsg.vh \
-  cache-BaseCacheDpath.v \
-  cache-BaseCacheCtrl.v \
-  cache-L1CacheCtrl.v \
-  cache-L1Cache.v \
-  cache-BaseCache.v \
-  cache-Arbiter2to1.v \
-  cache-L3MemAdapter.v \
-  cache-InclusiveCacheHier.v \
+  inclcache-InclMsg.vh \
+  inclcache-BaseCacheDpath.v \
+  inclcache-BaseCacheCtrl.v \
+  inclcache-L1CacheCtrl.v \
+  inclcache-L1Cache.v \
+  inclcache-BaseCache.v \
+  inclcache-Arbiter2to1.v \
+  inclcache-L3MemAdapter.v \
+  inclcache-InclusiveCacheHier.v \
 
 inclcache_test_srcs =
 

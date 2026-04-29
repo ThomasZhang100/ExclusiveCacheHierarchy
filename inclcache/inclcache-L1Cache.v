@@ -6,9 +6,9 @@
 
 `include "vc-MemReqMsg.v"
 `include "vc-MemRespMsg.v"
-`include "./cache-InclMsg.vh"
-`include "./cache-L1CacheCtrl.v"
-`include "./cache-BaseCacheDpath.v"
+`include "inclcache-InclMsg.vh"
+`include "inclcache-L1CacheCtrl.v"
+`include "inclcache-BaseCacheDpath.v"
 
 module cache_L1Cache
 #(

@@ -18,7 +18,7 @@
 
 `include "vc-MemReqMsg.v"
 `include "vc-MemRespMsg.v"
-`include "./cache-InclMsg.vh"
+`include "inclcache-InclMsg.vh"
 
 module cache_L3MemAdapter
 #(

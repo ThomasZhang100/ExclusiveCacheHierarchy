@@ -4,9 +4,9 @@
 `ifndef CACHE_BASE_CACHE_V
 `define CACHE_BASE_CACHE_V
 
-`include "./cache-InclMsg.vh"
-`include "./cache-BaseCacheCtrl.v"
-`include "./cache-BaseCacheDpath.v"
+`include "inclcache-InclMsg.vh"
+`include "inclcache-BaseCacheCtrl.v"
+`include "inclcache-BaseCacheDpath.v"
 
 module cache_BaseCache
 #(
