@@ -18,7 +18,7 @@
 
 `include "riscvlong-Core.v"
 `include "vc-TestDualPortRandDelayMem.v"
-`include "../inclcache/cache-InclusiveCacheHier.v"
+`include "../inclcache/inclcache-InclusiveCacheHier.v"
 
 module riscv_inclcache_sim;
 
@@ -61,15 +61,28 @@ module riscv_inclcache_sim;
   wire                                  cache_memresp_rdy;
 
   //----------------------------------------------------------------------
+  // Staggered resets (memory → cache → processor)
+  //----------------------------------------------------------------------
+  // Memory must be reset first so it is ready before the cache hierarchy
+  // and processor start accessing it.
+
+  reg reset_mem;
+  reg reset_cache;
+  reg reset_proc;
+
+  always @(posedge clk) begin
+    reset_mem   <= reset;
+    reset_cache <= reset_mem;
+    reset_proc  <= reset_cache;
+  end
+
+  //----------------------------------------------------------------------
   // Processor
   //----------------------------------------------------------------------
 
-  wire reset_mem;
-  assign reset_mem = reset;
-
   riscv_Core proc (
     .clk          (clk),
-    .reset        (reset),
+    .reset        (reset_proc),
 
     .imemreq_msg  (imemreq_msg),
     .imemreq_val  (imemreq_val),
@@ -112,7 +125,7 @@ module riscv_inclcache_sim;
     .p_l3_hit_lat    (10)
   ) cache_hier (
     .clk          (clk),
-    .reset        (reset),
+    .reset        (reset_cache),
 
     .imemreq_msg  (imemreq_msg),
     .imemreq_val  (imemreq_val),
