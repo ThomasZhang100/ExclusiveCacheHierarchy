@@ -41,6 +41,7 @@ topdir = ..
 subpkgs = \
   vc \
   cache \
+  inclcache \
   riscvlong \
   riscvooo \
 
@@ -143,6 +144,19 @@ check-asm-cache-riscvlong : $(long_tests_cache_outs)
 
 junk += $(long_tests_cache_outs)
 
+riscvlong_inclcache_sim = riscvlong-inclcache-sim
+
+long_tests_inclcache_outs = $(patsubst %.vmh,%-long-inclcache.out,$(tests))
+$(long_tests_inclcache_outs) : %-long-inclcache.out : %.vmh $(riscvlong_inclcache_sim)
+	./$(riscvlong_inclcache_sim) +stats=1 +vcd=1 +exe=$< > $@
+
+check-asm-inclcache-riscvlong : $(long_tests_inclcache_outs)
+	@echo; \
+  perl -ne 'print "  [$$1] $$ARGV \t$$2\n" if /\*{3}(.{8})\*{3}(.*)/' \
+       $(long_tests_inclcache_outs); echo;
+
+junk += $(long_tests_inclcache_outs)
+
 check-asm-riscvooo : $(ooo_tests_outs)
 	@echo; \
   perl -ne 'print "  [$$1] $$ARGV \t$$2\n" if /\*{3}(.{8})\*{3}(.*)/' \
@@ -198,6 +212,17 @@ run-bmark-cache-riscvlong : $(long_bmarks_cache_outs)
        $(long_bmarks_cache_outs); echo;
 
 junk += $(long_bmarks_cache_outs)
+
+long_bmarks_inclcache_outs = $(patsubst %.vmh,%-long-inclcache.out,$(bmarks))
+$(long_bmarks_inclcache_outs) : %-long-inclcache.out : %.vmh $(riscvlong_inclcache_sim)
+	./$(riscvlong_inclcache_sim) +verbose=1 +vcd=1 +exe=$< > $@
+
+run-bmark-inclcache-riscvlong : $(long_bmarks_inclcache_outs)
+	@echo; \
+  perl -ne 'print "  [$$1] $$ARGV \t$$2\n" if /\*{3}(.{8})\*{3}(.*)/' \
+       $(long_bmarks_inclcache_outs); echo;
+
+junk += $(long_bmarks_inclcache_outs)
 
 ooo_bmarks_outs = $(patsubst %.vmh,%-ooo.out,$(bmarks))
 $(ooo_bmarks_outs) : %-ooo.out : %.vmh $(riscvooo_rtl_sim)

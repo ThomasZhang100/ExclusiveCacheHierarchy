@@ -6,6 +6,7 @@ riscvlong_deps = \
   vc \
   imuldiv \
   cache \
+  inclcache \
 
 riscvlong_srcs = \
   riscvlong-CoreDpath.v \
@@ -24,4 +25,5 @@ riscvlong_prog_srcs = \
   riscvlong-sim.v \
   riscvlong-randdelay-sim.v \
   riscvlong-cache-sim.v \
+  riscvlong-inclcache-sim.v \
 
