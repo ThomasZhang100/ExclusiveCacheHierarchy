@@ -83,7 +83,7 @@ module riscv_inclcache_sim;
     .dmemresp_msg (dmemresp_msg),
     .dmemresp_val (dmemresp_val),
 
-    .status       (status)
+    .csr_status   (status)
   );
 
   //----------------------------------------------------------------------

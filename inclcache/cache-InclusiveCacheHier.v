@@ -44,11 +44,11 @@
 
 `include "vc-MemReqMsg.v"
 `include "vc-MemRespMsg.v"
-`include "cache-InclMsg.vh"
-`include "cache-L1Cache.v"
-`include "cache-BaseCache.v"
-`include "cache-Arbiter2to1.v"
-`include "cache-L3MemAdapter.v"
+`include "./cache-InclMsg.vh"
+`include "./cache-L1Cache.v"
+`include "./cache-BaseCache.v"
+`include "./cache-Arbiter2to1.v"
+`include "./cache-L3MemAdapter.v"
 
 module cache_InclusiveCacheHier
 #(
