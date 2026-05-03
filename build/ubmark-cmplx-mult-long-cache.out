@@ -1,4 +1,4 @@
-WARNING: ../riscvlong/riscvlong-cache-sim.v:213: $readmemh: The behaviour for reg[...] mem[N:0]; $readmemh("...", mem); changed in the 1364-2005 standard. To avoid ambiguity, use mem[0:N] or explicit range parameters $readmemh("...", mem, start, stop);. Defaulting to 1364-2005 behavior.
+WARNING: ../riscvlong/riscvlong-cache-sim.v:215: $readmemh: The behaviour for reg[...] mem[N:0]; $readmemh("...", mem); changed in the 1364-2005 standard. To avoid ambiguity, use mem[0:N] or explicit range parameters $readmemh("...", mem, start, stop);. Defaulting to 1364-2005 behavior.
 VCD info: dumpfile ../ubmark/build/vmh/ubmark-cmplx-mult-cache.vcd opened for output.
 *** PASSED ***
 --------------------------------------------
@@ -8,4 +8,4 @@ VCD info: dumpfile ../ubmark/build/vmh/ubmark-cmplx-mult-cache.vcd opened for ou
  num_cycles =       8771
  num_inst   =       1723
  ipc        = 0.196443
-../riscvlong/riscvlong-cache-sim.v:266: $finish called at 166035 (1s)
+../riscvlong/riscvlong-cache-sim.v:268: $finish called at 166035 (1s)
