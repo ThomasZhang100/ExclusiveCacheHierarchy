@@ -4,7 +4,9 @@
 
 #include "ubmark.h"
 
-#define STRIDE_WORDS 1024
+// stride = L1D_num_sets * (line_sz / sizeof(int)) = 64 * 4 = 256
+// buf[0] and buf[STRIDE_WORDS] map to the same L1 set under the default config
+#define STRIDE_WORDS 256
 #define ITERS 2048
 
 static volatile int conflict_buf[STRIDE_WORDS * 2] __attribute__((aligned(4096)));

@@ -48,21 +48,21 @@ INCLUDE_FLAGS = [
 ]
 
 DEFAULT_PARAMS = {
-    "p_l1i_num_sets": 256,
+    "p_l1i_num_sets": 64,
     "p_l1i_num_ways": 1,
     "p_l1i_line_sz": 16,
     "p_l1i_use_victim_buf": 0,
     "p_l1i_hit_lat": 1,
-    "p_l1d_num_sets": 256,
+    "p_l1d_num_sets": 64,
     "p_l1d_num_ways": 1,
     "p_l1d_line_sz": 16,
     "p_l1d_use_victim_buf": 0,
     "p_l1d_hit_lat": 1,
-    "p_l2_num_sets": 512,
+    "p_l2_num_sets": 128,
     "p_l2_num_ways": 4,
     "p_l2_line_sz": 16,
     "p_l2_hit_lat": 4,
-    "p_l3_num_sets": 2048,
+    "p_l3_num_sets": 512,
     "p_l3_num_ways": 8,
     "p_l3_line_sz": 16,
     "p_l3_hit_lat": 10,
@@ -71,12 +71,16 @@ DEFAULT_PARAMS = {
 EXPERIMENTS = {
     "default": {},
     "l1-half-capacity": {
+        "p_l1i_num_sets": 32,
+        "p_l1d_num_sets": 32,
+    },
+    "l1-double-capacity": {
         "p_l1i_num_sets": 128,
         "p_l1d_num_sets": 128,
     },
-    "l1-double-capacity": {
-        "p_l1i_num_sets": 512,
-        "p_l1d_num_sets": 512,
+    "l1-2way": {
+        "p_l1i_num_ways": 2,
+        "p_l1d_num_ways": 2,
     },
     "l1-victim-buffer": {
         "p_l1i_use_victim_buf": 1,
@@ -89,10 +93,10 @@ EXPERIMENTS = {
         "p_l2_num_ways": 8,
     },
     "l3-half-capacity": {
-        "p_l3_num_sets": 1024,
+        "p_l3_num_sets": 256,
     },
     "l3-double-capacity": {
-        "p_l3_num_sets": 4096,
+        "p_l3_num_sets": 1024,
     },
 }
 
