@@ -4,6 +4,7 @@ import argparse
 import csv
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
@@ -13,6 +14,17 @@ RISCVLONG_DIR = ROOT / "riscvlong"
 UBMARK_VMH_DIR = ROOT / "ubmark" / "build" / "vmh"
 BUILD_EXPERIMENTS_DIR = ROOT / "build" / "experiments"
 GENERATED_SIM_DIR = BUILD_EXPERIMENTS_DIR / "generated"
+
+def _find_vvp():
+    iverilog_path = shutil.which("iverilog")
+    if iverilog_path:
+        candidate = pathlib.Path(iverilog_path).parent / "vvp"
+        if candidate.exists():
+            return str(candidate)
+    return "vvp"
+
+
+VVP = _find_vvp()
 
 COMP_FLAGS = [
     "iverilog",
@@ -175,6 +187,7 @@ def run_benchmark(exe_path, variant_name, experiment_name, benchmark_path, max_c
     raw_out_path = raw_out_dir / f"{benchmark_path.stem}.out"
 
     cmd = [
+        VVP,
         str(exe_path),
         "+verbose=1",
         f"+max-cycles={max_cycles}",
