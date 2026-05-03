@@ -228,6 +228,7 @@ module cache_BaseCache
     .refill_tag_wen        (refill_tag_wen_oh),
     .refill_data_wen       (refill_data_wen_oh),
     .refill_line           (dn_refill_data),
+    .refill_preserve_dirty (1'b0),
     .mark_dirty            (mark_dirty),
     .store_hit_data_wen    (store_hit_data_wen_oh),
 

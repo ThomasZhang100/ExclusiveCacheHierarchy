@@ -42,6 +42,7 @@ module cache_BaseCacheDpath
   input  [p_num_ways-1:0]   refill_tag_wen,
   input  [p_num_ways-1:0]   refill_data_wen,
   input  [p_line_sz*8-1:0]  refill_line,       // data arriving from downstream
+  input                      refill_preserve_dirty,
   input                      mark_dirty,        // mark refill slot dirty (write-allocate)
   input  [p_num_ways-1:0]   store_hit_data_wen,
 
@@ -118,7 +119,7 @@ module cache_BaseCacheDpath
     for (i = 0; i < p_num_ways; i = i + 1) begin
       // Refill-set: write new tag (normal miss refill)
       if (refill_tag_wen[i])
-        tag_array[req_set_idx][i] <= {mark_dirty, 1'b1, req_tag};
+        tag_array[req_set_idx][i] <= {mark_dirty || refill_preserve_dirty, 1'b1, req_tag};
       // Refill-set: mark dirty on store hit
       if (store_hit_data_wen[i])
         tag_array[req_set_idx][i][c_tag_entry_sz-1] <= 1'b1;

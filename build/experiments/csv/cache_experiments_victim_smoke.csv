@@ -1,0 +1,17 @@
+experiment,variant,benchmark,status,num_cycles,num_inst,ipc,raw_output,p_l1d_hit_lat,p_l1d_line_sz,p_l1d_num_sets,p_l1d_num_ways,p_l1d_use_victim_buf,p_l1i_hit_lat,p_l1i_line_sz,p_l1i_num_sets,p_l1i_num_ways,p_l1i_use_victim_buf,p_l2_hit_lat,p_l2_line_sz,p_l2_num_sets,p_l2_num_ways,p_l3_hit_lat,p_l3_line_sz,p_l3_num_sets,p_l3_num_ways
+default,exclusive,bin-search,1,5527,1017,0.184006,build/experiments/raw/exclusive/default/ubmark-bin-search.out,1,16,256,1,0,1,16,256,1,0,4,16,512,4,10,16,2048,8
+default,exclusive,cmplx-mult,1,8771,1723,0.196443,build/experiments/raw/exclusive/default/ubmark-cmplx-mult.out,1,16,256,1,0,1,16,256,1,0,4,16,512,4,10,16,2048,8
+default,exclusive,masked-filter,1,22923,4931,0.215111,build/experiments/raw/exclusive/default/ubmark-masked-filter.out,1,16,256,1,0,1,16,256,1,0,4,16,512,4,10,16,2048,8
+default,exclusive,vvadd,1,2879,453,0.157346,build/experiments/raw/exclusive/default/ubmark-vvadd.out,1,16,256,1,0,1,16,256,1,0,4,16,512,4,10,16,2048,8
+default,inclusive,bin-search,1,5709,1017,0.17814,build/experiments/raw/inclusive/default/ubmark-bin-search.out,1,16,256,1,0,1,16,256,1,0,4,16,512,4,10,16,2048,8
+default,inclusive,cmplx-mult,1,8984,1723,0.191785,build/experiments/raw/inclusive/default/ubmark-cmplx-mult.out,1,16,256,1,0,1,16,256,1,0,4,16,512,4,10,16,2048,8
+default,inclusive,masked-filter,1,23456,4931,0.210223,build/experiments/raw/inclusive/default/ubmark-masked-filter.out,1,16,256,1,0,1,16,256,1,0,4,16,512,4,10,16,2048,8
+default,inclusive,vvadd,1,3030,453,0.149505,build/experiments/raw/inclusive/default/ubmark-vvadd.out,1,16,256,1,0,1,16,256,1,0,4,16,512,4,10,16,2048,8
+l1-victim-buffer,exclusive,bin-search,1,5527,1017,0.184006,build/experiments/raw/exclusive/l1-victim-buffer/ubmark-bin-search.out,1,16,256,1,1,1,16,256,1,1,4,16,512,4,10,16,2048,8
+l1-victim-buffer,exclusive,cmplx-mult,1,8771,1723,0.196443,build/experiments/raw/exclusive/l1-victim-buffer/ubmark-cmplx-mult.out,1,16,256,1,1,1,16,256,1,1,4,16,512,4,10,16,2048,8
+l1-victim-buffer,exclusive,masked-filter,1,22923,4931,0.215111,build/experiments/raw/exclusive/l1-victim-buffer/ubmark-masked-filter.out,1,16,256,1,1,1,16,256,1,1,4,16,512,4,10,16,2048,8
+l1-victim-buffer,exclusive,vvadd,1,2879,453,0.157346,build/experiments/raw/exclusive/l1-victim-buffer/ubmark-vvadd.out,1,16,256,1,1,1,16,256,1,1,4,16,512,4,10,16,2048,8
+l1-victim-buffer,inclusive,bin-search,1,5709,1017,0.17814,build/experiments/raw/inclusive/l1-victim-buffer/ubmark-bin-search.out,1,16,256,1,1,1,16,256,1,1,4,16,512,4,10,16,2048,8
+l1-victim-buffer,inclusive,cmplx-mult,1,8984,1723,0.191785,build/experiments/raw/inclusive/l1-victim-buffer/ubmark-cmplx-mult.out,1,16,256,1,1,1,16,256,1,1,4,16,512,4,10,16,2048,8
+l1-victim-buffer,inclusive,masked-filter,1,23456,4931,0.210223,build/experiments/raw/inclusive/l1-victim-buffer/ubmark-masked-filter.out,1,16,256,1,1,1,16,256,1,1,4,16,512,4,10,16,2048,8
+l1-victim-buffer,inclusive,vvadd,1,3030,453,0.149505,build/experiments/raw/inclusive/l1-victim-buffer/ubmark-vvadd.out,1,16,256,1,1,1,16,256,1,1,4,16,512,4,10,16,2048,8

@@ -1,0 +1,10 @@
+WARNING: /Users/abiralshakya/Documents/ece475_final_project/ExclusiveCacheHierarchy/build/experiments/generated/generated-riscvlong-cache-sim-l1-double-capacity.v:213: $readmemh: The behaviour for reg[...] mem[N:0]; $readmemh("...", mem); changed in the 1364-2005 standard. To avoid ambiguity, use mem[0:N] or explicit range parameters $readmemh("...", mem, start, stop);. Defaulting to 1364-2005 behavior.
+*** PASSED ***
+--------------------------------------------
+ STATS                                      
+--------------------------------------------
+ status     =          1
+ num_cycles =       2879
+ num_inst   =        453
+ ipc        = 0.157346
+/Users/abiralshakya/Documents/ece475_final_project/ExclusiveCacheHierarchy/build/experiments/generated/generated-riscvlong-cache-sim-l1-double-capacity.v:266: $finish called at 81255 (1s)

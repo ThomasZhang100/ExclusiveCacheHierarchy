@@ -1,0 +1,2 @@
+/Users/abiralshakya/Documents/ece475_final_project/ExclusiveCacheHierarchy/cache/cache-BaseCache.v:124: warning: implicit definition of wire 'lat_has_victim'.
+/Users/abiralshakya/Documents/ece475_final_project/ExclusiveCacheHierarchy/cache/cache-BaseCache.v:125: warning: implicit definition of wire 'lat_refill_addr'.

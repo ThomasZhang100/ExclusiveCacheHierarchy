@@ -181,6 +181,7 @@ bmarks = \
   ubmark-vvadd.vmh \
   ubmark-cmplx-mult.vmh \
   ubmark-masked-filter.vmh \
+  ubmark-conflict-miss.vmh \
   ubmark-bin-search.vmh \
 
 long_bmarks_outs = $(patsubst %.vmh,%-long.out,$(bmarks))
@@ -384,4 +385,3 @@ clean :
 	rm -rf *~ \#* *.vcd $(junk)
 
 .PHONY : clean
-

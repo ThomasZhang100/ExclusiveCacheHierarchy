@@ -75,12 +75,14 @@ module cache_L1CacheCtrl
   output reg              mark_dirty,           // write-allocate: store after refill
   output reg              lru_update_refill_en, // update LRU after hit or refill
   output reg              store_hit_wen_en,     // store hit: write word into hit line
+  output reg              victim_swap_en,
 
   //----------------------------------------------------------------------
   // Dpath status inputs
   //----------------------------------------------------------------------
 
   input                   hit,
+  input                   victim_hit,
   input                   refill_evict_valid,   // victim is occupied (need has_victim=1)
   input                   refill_evict_dirty    // victim is dirty (informational for L1)
 );
@@ -96,6 +98,7 @@ module cache_L1CacheCtrl
   localparam STATE_SWAP_WAIT  = 3'd4; // waiting for SWAP response (refill data)
   localparam STATE_REFILL_WR  = 3'd5; // write refill line into cache arrays
   localparam STATE_RESP       = 3'd6; // assert up_resp_val for one cycle
+  localparam STATE_VICTIM_SWAP = 3'd7; // satisfy miss from local victim buffer
 
   reg [2:0] state_reg, state_next;
 
@@ -148,6 +151,8 @@ module cache_L1CacheCtrl
       STATE_TAG_CHECK: begin
         if (hit)
           state_next = (p_hit_lat <= 1) ? STATE_RESP : STATE_HIT_WAIT;
+        else if (victim_hit)
+          state_next = STATE_VICTIM_SWAP;
         else
           state_next = STATE_SWAP_REQ;
       end
@@ -171,6 +176,10 @@ module cache_L1CacheCtrl
 
       STATE_REFILL_WR: begin
         // Write refill data into tag + data arrays (1 cycle SRAM write latency).
+        state_next = STATE_RESP;
+      end
+
+      STATE_VICTIM_SWAP: begin
         state_next = STATE_RESP;
       end
 
@@ -203,6 +212,7 @@ module cache_L1CacheCtrl
     mark_dirty           = 1'b0;
     lru_update_refill_en = 1'b0;
     store_hit_wen_en     = 1'b0;
+    victim_swap_en       = 1'b0;
 
     case (state_reg)
 
@@ -244,6 +254,14 @@ module cache_L1CacheCtrl
         refill_data_wen_en   = 1'b1;
         mark_dirty           = req_type_lat; // write-allocate: mark dirty if it was a store
         lru_update_refill_en = 1'b1;
+      end
+
+      STATE_VICTIM_SWAP: begin
+        refill_tag_wen_en    = 1'b1;
+        refill_data_wen_en   = 1'b1;
+        mark_dirty           = req_type_lat;
+        lru_update_refill_en = 1'b1;
+        victim_swap_en       = 1'b1;
       end
 
       STATE_RESP: begin

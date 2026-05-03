@@ -50,8 +50,10 @@ module cache_L1CacheCtrl
   output reg              mark_dirty,
   output reg              lru_update_refill_en,
   output reg              store_hit_wen_en,
+  output reg              victim_swap_en,
 
   input                   hit,
+  input                   victim_hit,
   input                   refill_evict_valid,
   input                   refill_evict_dirty
 );
@@ -63,6 +65,7 @@ module cache_L1CacheCtrl
   localparam STATE_MISS_WAIT = 3'd4;
   localparam STATE_REFILL_WR = 3'd5;
   localparam STATE_RESP      = 3'd6;
+  localparam STATE_VICTIM_SWAP = 3'd7;
 
   reg [2:0] state_reg, state_next;
 
@@ -99,6 +102,8 @@ module cache_L1CacheCtrl
       STATE_TAG_CHECK: begin
         if (hit)
           state_next = (p_hit_lat <= 1) ? STATE_RESP : STATE_HIT_WAIT;
+        else if (victim_hit)
+          state_next = STATE_VICTIM_SWAP;
         else
           state_next = STATE_MISS_REQ;
       end
@@ -119,6 +124,10 @@ module cache_L1CacheCtrl
       end
 
       STATE_REFILL_WR: begin
+        state_next = STATE_RESP;
+      end
+
+      STATE_VICTIM_SWAP: begin
         state_next = STATE_RESP;
       end
 
@@ -143,6 +152,7 @@ module cache_L1CacheCtrl
     mark_dirty           = 1'b0;
     lru_update_refill_en = 1'b0;
     store_hit_wen_en     = 1'b0;
+    victim_swap_en       = 1'b0;
 
     case (state_reg)
 
@@ -175,6 +185,14 @@ module cache_L1CacheCtrl
         refill_data_wen_en   = 1'b1;
         mark_dirty           = req_type_lat;
         lru_update_refill_en = 1'b1;
+      end
+
+      STATE_VICTIM_SWAP: begin
+        refill_tag_wen_en    = 1'b1;
+        refill_data_wen_en   = 1'b1;
+        mark_dirty           = req_type_lat;
+        lru_update_refill_en = 1'b1;
+        victim_swap_en       = 1'b1;
       end
 
       STATE_RESP: begin

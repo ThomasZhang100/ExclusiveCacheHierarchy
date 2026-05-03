@@ -107,11 +107,13 @@ module riscv_inclcache_sim;
     .p_l1i_num_sets  (256),
     .p_l1i_num_ways  (1),
     .p_l1i_line_sz   (16),
+    .p_l1i_use_victim_buf (0),
     .p_l1i_hit_lat   (1),
 
     .p_l1d_num_sets  (256),
     .p_l1d_num_ways  (1),
     .p_l1d_line_sz   (16),
+    .p_l1d_use_victim_buf (0),
     .p_l1d_hit_lat   (1),
 
     .p_l2_num_sets   (512),

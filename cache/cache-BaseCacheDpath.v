@@ -26,6 +26,7 @@ module cache_BaseCacheDpath
   input  [p_num_ways-1:0] refill_tag_wen,
   input  [p_num_ways-1:0] refill_data_wen,
   input  [p_line_sz*8-1:0] refill_line,
+  input                   refill_preserve_dirty,
   input  [p_num_ways-1:0] refill_invalidate_way,
   input                   mark_dirty,
   input                   inplace_swap,         // 1: refill_tag_wen writes victim fields
@@ -111,7 +112,7 @@ module cache_BaseCacheDpath
       if (refill_tag_wen[i])
         tag_array[req_set_idx][i] <= inplace_swap
           ? {incoming_victim_dirty, 1'b1, vic_tag}
-          : {mark_dirty, 1'b1, req_tag};
+          : {mark_dirty || refill_preserve_dirty, 1'b1, req_tag};
       // Refill-set: invalidate (line leaving upward to L1)
       if (refill_invalidate_way[i])
         tag_array[req_set_idx][i][c_tag_entry_sz-2] <= 1'b0; // clear valid

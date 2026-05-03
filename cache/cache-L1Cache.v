@@ -15,6 +15,7 @@ module cache_L1Cache
   parameter p_num_sets  = 256,
   parameter p_num_ways  = 1,
   parameter p_line_sz   = 16,
+  parameter p_use_victim_buf = 0,
   parameter p_hit_lat   = 1,
   parameter p_addr_sz   = 32,
   parameter p_data_sz   = 32
@@ -65,6 +66,7 @@ module cache_L1Cache
 
   wire                   dn_resp_has_data = dn_resp_msg[c_line_bits];
   wire [c_line_bits-1:0] dn_resp_refill_line = dn_resp_msg[c_line_bits-1:0];
+  wire [p_addr_sz-1:0]   req_line_addr = {req_addr_lat[p_addr_sz-1:c_offset_sz], {c_offset_sz{1'b0}}};
 
   //----------------------------------------------------------------------
   // Controller
@@ -85,6 +87,7 @@ module cache_L1Cache
   wire                  ctrl_dn_req_has_victim;
   wire                  ctrl_dn_req_has_refill;
   wire [p_addr_sz-1:0]  ctrl_dn_req_refill_addr;
+  wire                  victim_swap_en;
 
   wire                  hit;
   wire [c_way_bits-1:0] hit_way;
@@ -93,6 +96,12 @@ module cache_L1Cache
   wire [c_line_bits-1:0] refill_evict_line;
   wire                  refill_evict_dirty;
   wire                  refill_evict_valid;
+
+  reg                   victim_valid;
+  reg                   victim_dirty;
+  reg [p_addr_sz-1:0]   victim_addr;
+  reg [c_line_bits-1:0] victim_line;
+  wire                  victim_hit = p_use_victim_buf && victim_valid && (victim_addr == req_line_addr);
 
   // Latched request fields — registered here, fed to ctrl and dpath
   reg                  req_type_lat;
@@ -147,14 +156,30 @@ module cache_L1Cache
     .mark_dirty           (mark_dirty),
     .lru_update_refill_en (lru_update_refill_en),
     .store_hit_wen_en     (store_hit_wen_en),
+    .victim_swap_en       (victim_swap_en),
 
     .hit                  (hit),
+    .victim_hit           (victim_hit),
     .refill_evict_valid   (refill_evict_valid),
     .refill_evict_dirty   (refill_evict_dirty)
   );
 
   assign up_req_rdy  = ctrl_up_req_rdy;
   assign up_resp_val = ctrl_up_resp_val;
+
+  always @(posedge clk) begin
+    if (reset) begin
+      victim_valid <= 1'b0;
+      victim_dirty <= 1'b0;
+      victim_addr  <= {p_addr_sz{1'b0}};
+      victim_line  <= {c_line_bits{1'b0}};
+    end else if (victim_swap_en) begin
+      victim_valid <= refill_evict_valid;
+      victim_dirty <= refill_evict_dirty;
+      victim_addr  <= refill_evict_addr;
+      victim_line  <= refill_evict_line;
+    end
+  end
 
   //----------------------------------------------------------------------
   // One-hot decoders for dpath write enables
@@ -189,6 +214,9 @@ module cache_L1Cache
 
   // up_resp_rdata from dpath: word at req_offset from the hit/refill line.
   wire [p_data_sz-1:0] up_resp_rdata;
+  wire [c_line_bits-1:0] refill_line_mux = victim_swap_en ? victim_line : dn_resp_refill_line;
+  wire effective_mark_dirty = victim_swap_en ? req_type_lat : mark_dirty;
+  wire refill_preserve_dirty = victim_swap_en && victim_dirty;
 
   always @(posedge clk) begin
     if (reset) begin
@@ -234,9 +262,10 @@ module cache_L1Cache
 
     .refill_tag_wen         (refill_tag_wen_oh),
     .refill_data_wen        (refill_data_wen_oh),
-    .refill_line            (dn_resp_refill_line),
+    .refill_line            (refill_line_mux),
+    .refill_preserve_dirty  (refill_preserve_dirty),
     .refill_invalidate_way  (refill_inv_oh),
-    .mark_dirty             (mark_dirty),
+    .mark_dirty             (effective_mark_dirty),
     .inplace_swap           (1'b0),
     .store_hit_data_wen     (store_hit_data_wen_oh),
 

@@ -55,11 +55,13 @@ module cache_InclusiveCacheHier
   parameter p_l1i_num_sets  = 256,
   parameter p_l1i_num_ways  = 1,
   parameter p_l1i_line_sz   = 16,
+  parameter p_l1i_use_victim_buf = 0,
   parameter p_l1i_hit_lat   = 1,
 
   parameter p_l1d_num_sets  = 256,
   parameter p_l1d_num_ways  = 1,
   parameter p_l1d_line_sz   = 16,
+  parameter p_l1d_use_victim_buf = 0,
   parameter p_l1d_hit_lat   = 1,
 
   parameter p_l2_num_sets   = 512,
@@ -149,6 +151,7 @@ module cache_InclusiveCacheHier
     .p_num_sets (p_l1i_num_sets),
     .p_num_ways (p_l1i_num_ways),
     .p_line_sz  (p_l1i_line_sz),
+    .p_use_victim_buf (p_l1i_use_victim_buf),
     .p_hit_lat  (p_l1i_hit_lat),
     .p_addr_sz  (p_addr_sz),
     .p_data_sz  (p_data_sz)
@@ -176,6 +179,7 @@ module cache_InclusiveCacheHier
     .p_num_sets (p_l1d_num_sets),
     .p_num_ways (p_l1d_num_ways),
     .p_line_sz  (p_l1d_line_sz),
+    .p_use_victim_buf (p_l1d_use_victim_buf),
     .p_hit_lat  (p_l1d_hit_lat),
     .p_addr_sz  (p_addr_sz),
     .p_data_sz  (p_data_sz)

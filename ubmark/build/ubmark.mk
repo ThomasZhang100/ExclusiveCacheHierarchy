@@ -18,5 +18,5 @@ ubmark_install_prog_srcs = \
   ubmark-vvadd.c \
   ubmark-cmplx-mult.c \
   ubmark-bin-search.c \
+  ubmark-conflict-miss.c \
   ubmark-masked-filter.c \
-

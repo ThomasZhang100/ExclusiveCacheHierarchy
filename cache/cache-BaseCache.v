@@ -266,6 +266,7 @@ module cache_BaseCache
     .refill_tag_wen         (refill_tag_wen_oh),
     .refill_data_wen        (refill_data_wen_oh),
     .refill_line            (refill_line_mux),
+    .refill_preserve_dirty  (1'b0),
     .refill_invalidate_way  (refill_inv_oh),
     .mark_dirty             (mark_dirty),
     .inplace_swap           (inplace_swap),
