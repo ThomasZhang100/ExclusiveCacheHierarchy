@@ -20,3 +20,4 @@ ubmark_install_prog_srcs = \
   ubmark-bin-search.c \
   ubmark-conflict-miss.c \
   ubmark-masked-filter.c \
+  ubmark-reuse-scan.c \
