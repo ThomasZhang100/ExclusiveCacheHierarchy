@@ -1,6 +1,4 @@
-//=========================================================================
-// Inclusive L2 / L3 Cache  (INCL upstream and downstream)
-//=========================================================================
+// Inclusive L2/L3 cache (INCL upstream and downstream)
 `ifndef CACHE_BASE_CACHE_V
 `define CACHE_BASE_CACHE_V
 
@@ -39,27 +37,15 @@ module cache_BaseCache
 
   localparam c_line_bits = p_line_sz * 8;
   localparam c_way_bits  = $clog2(p_num_ways > 1 ? p_num_ways : 2);
-
-  //----------------------------------------------------------------------
   // Unpack upstream INCL request
   // Layout: has_victim | victim_addr | refill_addr | victim_data
-  //----------------------------------------------------------------------
-
   wire [c_line_bits-1:0]  up_victim_data = up_req_msg[c_line_bits-1    : 0];
   wire [p_addr_sz-1:0]    up_refill_addr = up_req_msg[c_line_bits+31   : c_line_bits];
   wire [p_addr_sz-1:0]    up_victim_addr = up_req_msg[c_line_bits+63   : c_line_bits+32];
   wire                     up_has_victim  = up_req_msg[c_line_bits+64];
-
-  //----------------------------------------------------------------------
   // Unpack downstream INCL response
-  //----------------------------------------------------------------------
-
   wire [c_line_bits-1:0] dn_refill_data = dn_resp_msg[c_line_bits-1:0];
-
-  //----------------------------------------------------------------------
   // Latch upstream request fields on accept (IDLE → TAG_CHECK)
-  //----------------------------------------------------------------------
-
   reg                   lat_has_victim;
   reg [p_addr_sz-1:0]   lat_refill_addr;
   reg [p_addr_sz-1:0]   lat_victim_addr;
@@ -80,11 +66,7 @@ module cache_BaseCache
       lat_victim_data <= up_victim_data;
     end
   end
-
-  //----------------------------------------------------------------------
   // Dpath ↔ Ctrl wires
-  //----------------------------------------------------------------------
-
   wire                   hit;
   wire [c_way_bits-1:0]  hit_way;
   wire [c_way_bits-1:0]  victim_hit_way;
@@ -109,11 +91,7 @@ module cache_BaseCache
   wire                    ctrl_dn_resp_rdy;
   wire                    ctrl_dn_req_has_victim;
   wire [p_addr_sz-1:0]    ctrl_dn_req_refill_addr;
-
-  //----------------------------------------------------------------------
   // Controller
-  //----------------------------------------------------------------------
-
   cache_BaseCacheCtrl #(
     .p_num_sets (p_num_sets),
     .p_num_ways (p_num_ways),
@@ -156,11 +134,7 @@ module cache_BaseCache
 
   assign up_req_rdy  = ctrl_up_req_rdy;
   assign up_resp_val = ctrl_up_resp_val;
-
-  //----------------------------------------------------------------------
   // One-hot decoders for dpath write enables
-  //----------------------------------------------------------------------
-
   reg [p_num_ways-1:0] refill_tag_wen_oh;
   reg [p_num_ways-1:0] refill_data_wen_oh;
   reg [p_num_ways-1:0] store_hit_data_wen_oh;
@@ -182,13 +156,9 @@ module cache_BaseCache
       if (victim_data_wen_en && w == victim_hit_way)   victim_data_wen_oh[w]    = 1'b1;
     end
   end
-
-  //----------------------------------------------------------------------
   // Latch the response line
   // On TAG_CHECK when hit: capture hit_line.
   // On DN_WAIT when response arrives: capture refill data from downstream.
-  //----------------------------------------------------------------------
-
   reg [c_line_bits-1:0] resp_line;
 
   always @(posedge clk) begin
@@ -201,11 +171,7 @@ module cache_BaseCache
         resp_line <= dn_refill_data;
     end
   end
-
-  //----------------------------------------------------------------------
   // Datapath
-  //----------------------------------------------------------------------
-
   cache_BaseCacheDpath #(
     .p_num_sets (p_num_sets),
     .p_num_ways (p_num_ways),
@@ -248,19 +214,11 @@ module cache_BaseCache
     .refill_evict_valid    (refill_evict_valid),
     .victim_hit_way        (victim_hit_way)
   );
-
-  //----------------------------------------------------------------------
   // Pack upstream response
   // Layout: has_data | refill_data  (has_data always 1)
-  //----------------------------------------------------------------------
-
   assign up_resp_msg = {1'b1, resp_line};
-
-  //----------------------------------------------------------------------
   // Pack downstream INCL request
   // Layout: has_victim | victim_addr | refill_addr | victim_data
-  //----------------------------------------------------------------------
-
   assign dn_req_msg = {
     ctrl_dn_req_has_victim,  // dirty eviction from refill_set (if any)
     refill_evict_addr,       // evicted line's address

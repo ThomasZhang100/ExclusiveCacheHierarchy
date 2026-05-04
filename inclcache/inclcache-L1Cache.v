@@ -1,6 +1,4 @@
-//=========================================================================
-// L1 Cache  (VC_MEM upstream, INCL downstream)
-//=========================================================================
+// L1 cache (VC_MEM upstream, INCL downstream)
 `ifndef CACHE_L1_CACHE_V
 `define CACHE_L1_CACHE_V
 
@@ -42,11 +40,7 @@ module cache_L1Cache
   localparam c_line_bits = p_line_sz * 8;
   localparam c_offset_sz = $clog2(p_line_sz);
   localparam c_way_bits  = $clog2(p_num_ways > 1 ? p_num_ways : 2);
-
-  //----------------------------------------------------------------------
   // Unpack CPU request
-  //----------------------------------------------------------------------
-
   wire                   req_type;
   wire [p_addr_sz-1:0]   req_addr;
   wire [1:0]             req_len;
@@ -59,18 +53,10 @@ module cache_L1Cache
     .len  (req_len),
     .data (req_wdata)
   );
-
-  //----------------------------------------------------------------------
   // Downstream response fields
-  //----------------------------------------------------------------------
-
   wire [c_line_bits-1:0] dn_resp_refill_line = dn_resp_msg[c_line_bits-1:0];
   wire [p_addr_sz-1:0]   req_line_addr = {req_addr_lat[p_addr_sz-1:c_offset_sz], {c_offset_sz{1'b0}}};
-
-  //----------------------------------------------------------------------
   // Latched request fields
-  //----------------------------------------------------------------------
-
   reg                  req_type_lat;
   reg [1:0]            req_len_lat;
   reg [p_addr_sz-1:0]  req_addr_lat;
@@ -91,11 +77,7 @@ module cache_L1Cache
       req_wdata_lat <= req_wdata;
     end
   end
-
-  //----------------------------------------------------------------------
   // Controller
-  //----------------------------------------------------------------------
-
   wire ctrl_up_resp_val;
   wire ctrl_dn_req_val;
   wire ctrl_dn_resp_rdy;
@@ -175,11 +157,7 @@ module cache_L1Cache
       victim_line  <= refill_evict_line;
     end
   end
-
-  //----------------------------------------------------------------------
   // One-hot decoders for dpath write enables
-  //----------------------------------------------------------------------
-
   reg [p_num_ways-1:0] refill_tag_wen_oh;
   reg [p_num_ways-1:0] refill_data_wen_oh;
   reg [p_num_ways-1:0] store_hit_data_wen_oh;
@@ -195,11 +173,7 @@ module cache_L1Cache
       if (store_hit_wen_en   && w == hit_way)        store_hit_data_wen_oh[w] = 1'b1;
     end
   end
-
-  //----------------------------------------------------------------------
   // Datapath
-  //----------------------------------------------------------------------
-
   wire [p_data_sz-1:0] up_resp_rdata;
   wire [c_line_bits-1:0] refill_line_mux = victim_swap_en ? victim_line : dn_resp_refill_line;
   wire effective_mark_dirty = victim_swap_en ? req_type_lat : mark_dirty;
@@ -249,23 +223,15 @@ module cache_L1Cache
     .refill_evict_valid    (refill_evict_valid),
     .victim_hit_way        ()
   );
-
-  //----------------------------------------------------------------------
   // Pack upstream response (VC_MEM)
-  //----------------------------------------------------------------------
-
   vc_MemRespMsgToBits #(p_data_sz) resp_pack (
     .type (req_type),
     .len  (2'd0),
     .data (up_resp_rdata),
     .bits (up_resp_msg)
   );
-
-  //----------------------------------------------------------------------
   // Pack downstream INCL request
   // Layout: has_victim | victim_addr | refill_addr | victim_data
-  //----------------------------------------------------------------------
-
   assign dn_req_msg = {
     ctrl_dn_req_has_victim,   // 1: dirty victim being donated
     refill_evict_addr,        // victim_addr (from dpath)

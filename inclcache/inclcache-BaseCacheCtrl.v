@@ -1,17 +1,5 @@
-//=========================================================================
-// Inclusive L2 / L3 Cache Controller
-//=========================================================================
-// FSM for the inclusive BaseCache.
-//
-// Request flow:
-//   TAG_CHECK: look up refill_addr and victim_addr simultaneously.
-//   WRITE_VICTIM (if lat_has_victim): write incoming victim data into its
-//     slot in vic_set_idx (guaranteed present by inclusion invariant).
-//   If refill hit: → RESP.
-//   If refill miss: → DN_REQ, send downstream INCL request (with dirty
-//     eviction victim if refill_lru slot is occupied and dirty).
-//   DN_WAIT → REFILL_WR: write downstream refill data into LRU slot.
-//   RESP: assert up_resp_val.
+// Inclusive L2/L3 cache controller FSM.
+// On miss: sends INCL request downstream with dirty eviction victim if LRU slot occupied and dirty.
 
 `ifndef CACHE_BASE_CACHE_CTRL_V
 `define CACHE_BASE_CACHE_CTRL_V

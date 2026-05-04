@@ -1,17 +1,5 @@
-//=========================================================================
-// L3 Cache ↔ Main Memory Adapter  (Inclusive INCL → word-sized VC_MEM)
-//=========================================================================
-// Bridges L3's line-sized INCL downstream interface to the word-sized
-// VC_MEM interface of vc_TestDualPortRandDelayMem.
-//
-// A single INCL request is decomposed into word-sized memory transactions:
-//
-//   has_victim=0  →  c_words_per_line READ  requests
-//   has_victim=1  →  c_words_per_line WRITEs (victim always dirty in inclusive)
-//                    then c_words_per_line READs  (refill always needed)
-//
-// Every request always generates a refill (no has_refill bit).
-// Every sent victim is always dirty (no victim_dirty bit).
+// L3 to main memory adapter (INCL → word-sized VC_MEM).
+// has_victim=0: reads only; has_victim=1: writes (victim always dirty) then reads (refill always needed).
 
 `ifndef CACHE_L3_MEM_ADAPTER_V
 `define CACHE_L3_MEM_ADAPTER_V
@@ -50,23 +38,15 @@ module cache_L3MemAdapter
   localparam c_bytes_per_word = p_data_sz / 8;
   localparam c_words_per_line = p_line_sz / c_bytes_per_word;
   localparam c_word_cnt_sz    = $clog2(c_words_per_line + 1);
-
-  //----------------------------------------------------------------------
   // Unpack incoming INCL request
   // Layout: has_victim | victim_addr | refill_addr | victim_data
-  //----------------------------------------------------------------------
-
   wire [c_line_bits-1:0]  req_victim_data = dn_req_msg[c_line_bits-1    : 0];
   wire [p_addr_sz-1:0]    req_refill_addr = dn_req_msg[c_line_bits+31   : c_line_bits];
   wire [p_addr_sz-1:0]    req_victim_addr = dn_req_msg[c_line_bits+63   : c_line_bits+32];
   wire                     req_has_victim  = dn_req_msg[c_line_bits+64];
 
   wire [p_data_sz-1:0] memresp_data = memresp_msg[p_data_sz-1:0];
-
-  //----------------------------------------------------------------------
   // FSM
-  //----------------------------------------------------------------------
-
   localparam STATE_IDLE       = 3'd0;
   localparam STATE_WRITE_REQ  = 3'd1;
   localparam STATE_WRITE_RESP = 3'd2;

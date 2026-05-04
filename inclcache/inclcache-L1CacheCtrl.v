@@ -1,17 +1,5 @@
-//=========================================================================
-// L1 Cache Controller  (Inclusive hierarchy)
-//=========================================================================
-// Handles the L1-specific upstream protocol.  On a miss the controller
-// constructs an INCL request to send downstream:
-//
-//   has_victim  = refill_evict_valid && refill_evict_dirty
-//                 (only dirty lines need writeback; L2 already has clean copies)
-//   victim_addr = refill_evict_addr
-//   victim_data = refill_evict_line
-//   refill_addr = line-aligned CPU request address
-//
-// There is no has_refill bit (all requests need data back) and no
-// victim_dirty bit (every sent victim is guaranteed to be dirty).
+// L1 cache controller (inclusive hierarchy).
+// On miss: has_victim=refill_evict_valid&&dirty; clean evictions not sent (L2 already has copy).
 
 `ifndef CACHE_L1_CACHE_CTRL_V
 `define CACHE_L1_CACHE_CTRL_V

@@ -1,16 +1,5 @@
-//=========================================================================
-// Inclusive Cache Datapath
-//=========================================================================
-// Simplified from the exclusive version:
-//   - No victim-set staging area (L2/L3 always hold L1's lines by inclusion)
-//   - No inplace_swap (exclusive-only optimisation)
-//   - No victim_dirty input (sent victims are always dirty)
-//   - Adds victim_hit_way output (which way in vic_set_idx the incoming
-//     victim occupies — found by tag comparison, used for data write-back)
-//
-// Two simultaneous set lookups are supported combinatorially:
-//   req_set_idx  ← from refill_addr  (the address being looked up / filled)
-//   vic_set_idx  ← from incoming_victim_addr (the victim being written back)
+// Inclusive cache datapath (no victim-set staging, no inplace_swap; adds victim_hit_way).
+// Two simultaneous set lookups: req_set_idx (refill) and vic_set_idx (victim writeback).
 
 `ifndef CACHE_BASE_CACHE_DPATH_V
 `define CACHE_BASE_CACHE_DPATH_V
@@ -84,22 +73,14 @@ module cache_BaseCacheDpath
 
   // Tag entry: dirty(1) | valid(1) | tag(c_tag_sz)
   localparam c_tag_entry_sz = 1 + 1 + c_tag_sz;
-
-  //----------------------------------------------------------------------
   // Address decomposition
-  //----------------------------------------------------------------------
-
   wire [c_idx_sz-1:0]   req_set_idx = refill_addr[c_offset_sz+c_idx_sz-1 : c_offset_sz];
   wire [c_tag_sz-1:0]   req_tag     = refill_addr[p_addr_sz-1 : c_offset_sz+c_idx_sz];
   wire [c_offset_sz-1:0] req_offset = refill_addr[c_offset_sz-1:0];
 
   wire [c_idx_sz-1:0]   vic_set_idx = incoming_victim_addr[c_offset_sz+c_idx_sz-1 : c_offset_sz];
   wire [c_tag_sz-1:0]   vic_tag     = incoming_victim_addr[p_addr_sz-1 : c_offset_sz+c_idx_sz];
-
-  //----------------------------------------------------------------------
   // Tag SRAM
-  //----------------------------------------------------------------------
-
   reg [c_tag_entry_sz-1:0] tag_array [0:p_num_sets-1][0:p_num_ways-1];
 
   // Combinational reads for both sets
@@ -128,11 +109,7 @@ module cache_BaseCacheDpath
         tag_array[vic_set_idx][i] <= {1'b1, 1'b1, vic_tag};
     end
   end
-
-  //----------------------------------------------------------------------
   // Data SRAM
-  //----------------------------------------------------------------------
-
   reg [c_line_bits-1:0] data_array [0:p_num_sets-1][0:p_num_ways-1];
 
   wire [c_line_bits-1:0] data_rd_refill [0:p_num_ways-1];
@@ -174,11 +151,7 @@ module cache_BaseCacheDpath
       end
     end
   end
-
-  //----------------------------------------------------------------------
   // Hit detection (refill set)
-  //----------------------------------------------------------------------
-
   reg                   hit_r;
   reg [c_way_bits-1:0]  hit_way_r;
 
@@ -196,11 +169,7 @@ module cache_BaseCacheDpath
 
   assign hit     = hit_r;
   assign hit_way = hit_way_r;
-
-  //----------------------------------------------------------------------
   // Victim-set lookup: find which way holds the incoming victim
-  //----------------------------------------------------------------------
-
   reg [c_way_bits-1:0] victim_hit_way_r;
 
   always @(*) begin
@@ -213,11 +182,7 @@ module cache_BaseCacheDpath
   end
 
   assign victim_hit_way = victim_hit_way_r;
-
-  //----------------------------------------------------------------------
   // Tree Pseudo-LRU (refill set only)
-  //----------------------------------------------------------------------
-
   localparam c_plru_levels = $clog2(p_num_ways > 1 ? p_num_ways : 2);
   localparam c_plru_bits   = (p_num_ways > 1) ? (p_num_ways - 1) : 1;
 
@@ -270,31 +235,19 @@ module cache_BaseCacheDpath
       end
     end
   end
-
-  //----------------------------------------------------------------------
   // Refill-set eviction info (LRU way)
-  //----------------------------------------------------------------------
-
   wire [c_tag_entry_sz-1:0] refill_evict_entry = tag_rd_refill[refill_lru_way];
 
   assign refill_evict_valid = refill_evict_entry[c_tag_entry_sz-2];
   assign refill_evict_dirty = refill_evict_entry[c_tag_entry_sz-1];
   assign refill_evict_line  = data_rd_refill[refill_lru_way];
   assign refill_evict_addr  = {refill_evict_entry[c_tag_sz-1:0], req_set_idx, {c_offset_sz{1'b0}}};
-
-  //----------------------------------------------------------------------
   // CPU word extraction
-  //----------------------------------------------------------------------
-
   wire [c_offset_sz-3:0] word_idx = req_offset[c_offset_sz-1:2];
 
   assign hit_line      = data_rd_refill[hit_way];
   assign up_resp_rdata = (hit_line[word_idx * p_data_sz +: p_data_sz]) >> (req_offset[1:0] * 8);
-
-  //----------------------------------------------------------------------
   // Cache initialisation at reset
-  //----------------------------------------------------------------------
-
   integer si, wi;
   initial begin
     for (si = 0; si < p_num_sets; si = si + 1)

@@ -1,43 +1,5 @@
-//=========================================================================
-// Inclusive Three-Level Cache Hierarchy for riscvlong  (INCL protocol)
-//=========================================================================
-//
-// Topology
-// --------
-//
-//   riscv_Core
-//     imem (VC_MEM)     dmem (VC_MEM)
-//         |                 |
-//      cache_L1Cache     cache_L1Cache
-//      (L1I, read-only)  (L1D, read-write)
-//         |                 |
-//     INCL req          INCL req
-//         \               /
-//       cache_Arbiter2to1        ← round-robin serialiser
-//               |
-//           INCL req
-//               |
-//         cache_BaseCache  (L2, unified)
-//               |
-//           INCL req
-//               |
-//         cache_BaseCache  (L3, unified)
-//               |
-//           INCL req
-//               |
-//       cache_L3MemAdapter       ← decomposes INCL into word-sized VC_MEM
-//               |
-//   vc_TestDualPortRandDelayMem  (port 0 only)
-//
-// Inclusive-cache invariant
-// -------------------------
-//   Every line in L1 is also present in L2 and L3 (L1 ⊆ L2 ⊆ L3).
-//   When L1 evicts a dirty line it donates it downstream so L2/L3 can
-//   update their copy.  Clean evictions from L1 are silent (L2/L3 already
-//   hold the correct data).
-//
-//   On a miss, the requested line is fetched from the next level and
-//   installed in all levels along the path (L3 → L2 → L1).
+// Inclusive 3-level cache hierarchy (INCL protocol): L1I+L1D → Arbiter → L2 → L3 → MemAdapter
+// L1 ⊆ L2 ⊆ L3; dirty L1 evictions donated downstream; clean evictions silent.
 
 `ifndef CACHE_INCLUSIVE_CACHE_HIER_V
 `define CACHE_INCLUSIVE_CACHE_HIER_V
@@ -142,11 +104,7 @@ module cache_InclusiveCacheHier
   wire [`CACHE_INCL_RESP_SZ(LINE_SZ)-1:0]  l3_dn_resp_msg;
   wire                                       l3_dn_resp_val;
   wire                                       l3_dn_resp_rdy;
-
-  //----------------------------------------------------------------------
   // L1 Instruction Cache
-  //----------------------------------------------------------------------
-
   cache_L1Cache #(
     .p_num_sets (p_l1i_num_sets),
     .p_num_ways (p_l1i_num_ways),
@@ -170,11 +128,7 @@ module cache_InclusiveCacheHier
     .dn_resp_val (l1i_dn_resp_val),
     .dn_resp_rdy (l1i_dn_resp_rdy)
   );
-
-  //----------------------------------------------------------------------
   // L1 Data Cache
-  //----------------------------------------------------------------------
-
   cache_L1Cache #(
     .p_num_sets (p_l1d_num_sets),
     .p_num_ways (p_l1d_num_ways),
@@ -198,11 +152,7 @@ module cache_InclusiveCacheHier
     .dn_resp_val (l1d_dn_resp_val),
     .dn_resp_rdy (l1d_dn_resp_rdy)
   );
-
-  //----------------------------------------------------------------------
   // L1 → L2 Arbiter
-  //----------------------------------------------------------------------
-
   cache_Arbiter2to1 #(
     .p_line_sz (LINE_SZ),
     .p_addr_sz (p_addr_sz)
@@ -228,11 +178,7 @@ module cache_InclusiveCacheHier
     .dn_resp_val (arb_l2_resp_val),
     .dn_resp_rdy (arb_l2_resp_rdy)
   );
-
-  //----------------------------------------------------------------------
   // L2 Unified Cache
-  //----------------------------------------------------------------------
-
   cache_BaseCache #(
     .p_num_sets (p_l2_num_sets),
     .p_num_ways (p_l2_num_ways),
@@ -256,11 +202,7 @@ module cache_InclusiveCacheHier
     .dn_resp_val (l2_dn_resp_val),
     .dn_resp_rdy (l2_dn_resp_rdy)
   );
-
-  //----------------------------------------------------------------------
   // L3 Unified Cache
-  //----------------------------------------------------------------------
-
   cache_BaseCache #(
     .p_num_sets (p_l3_num_sets),
     .p_num_ways (p_l3_num_ways),
@@ -284,11 +226,7 @@ module cache_InclusiveCacheHier
     .dn_resp_val (l3_dn_resp_val),
     .dn_resp_rdy (l3_dn_resp_rdy)
   );
-
-  //----------------------------------------------------------------------
   // L3 ↔ Main Memory Adapter
-  //----------------------------------------------------------------------
-
   cache_L3MemAdapter #(
     .p_line_sz (p_l3_line_sz),
     .p_addr_sz (p_addr_sz),

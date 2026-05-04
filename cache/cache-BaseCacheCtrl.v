@@ -1,6 +1,4 @@
-//=========================================================================
-// L2 / L3 Cache Controller  (SWAP protocol, set-index aware)
-//=========================================================================
+// L2/L3 cache controller (SWAP protocol)
 `ifndef CACHE_BASE_CACHE_CTRL_V
 `define CACHE_BASE_CACHE_CTRL_V
 

@@ -1,49 +1,5 @@
-//=========================================================================
-// Exclusive Three-Level Cache Hierarchy for riscvlong  (SWAP protocol)
-//=========================================================================
-//
-// Topology
-// --------
-//
-//   riscv_Core
-//     imem (VC_MEM)     dmem (VC_MEM)
-//         |                 |
-//      cache_L1Cache     cache_L1Cache
-//      (L1I, read-only)  (L1D, read-write)
-//         |                 |
-//     SWAP req          SWAP req
-//         \               /
-//       cache_Arbiter2to1        ← round-robin serialiser
-//               |
-//           SWAP req
-//               |
-//         cache_BaseCache  (L2, unified)
-//               |
-//           SWAP req
-//               |
-//         cache_BaseCache  (L3, unified)
-//               |
-//           SWAP req
-//               |
-//       cache_L3MemAdapter       ← decomposes SWAP into word-sized VC_MEM
-//               |
-//   vc_TestDualPortRandDelayMem  (port 0 only)
-//
-// Exclusive-cache invariant
-// -------------------------
-//   Any valid line lives in EXACTLY ONE level at any time.
-//   SWAP messages carry both the outgoing victim and the refill address,
-//   allowing the receiving level to perform an in-place slot swap when
-//   the two addresses happen to index the same set (avoiding unnecessary
-//   downstream evictions).  The set-index mismatch case is handled by
-//   the BaseCacheCtrl FSM (EVICT_V → PLACE_V → SWAP_REQ path).
-//
-// Val/Rdy CPU stalling
-// --------------------
-//   L1I/L1D caches deassert imemreq_rdy / dmemreq_rdy while a miss is
-//   being serviced.  The CPU holds its request stable until rdy is
-//   re-asserted.  up_resp_val is a one-cycle pulse; no back-pressure from
-//   the CPU side (riscvlong-Core has no memresp_rdy output).
+// Exclusive 3-level cache hierarchy (SWAP protocol): L1I+L1D → Arbiter → L2 → L3 → MemAdapter
+// Lines live in exactly one level; SWAP carries victim+refill. L1 deasserts *req_rdy during misses.
 
 `ifndef CACHE_EXCLUSIVE_CACHE_HIER_V
 `define CACHE_EXCLUSIVE_CACHE_HIER_V
@@ -90,11 +46,7 @@ module cache_ExclusiveCacheHier
 )(
   input clk,
   input reset,
-
-  //======================================================================
   // CPU-facing interface  (connect directly to riscvlong-Core ports)
-  //======================================================================
-
   input  [`VC_MEM_REQ_MSG_SZ(p_addr_sz,p_data_sz)-1:0]  imemreq_msg,
   input                                                   imemreq_val,
   output                                                  imemreq_rdy,  // stalls pipeline
@@ -106,12 +58,7 @@ module cache_ExclusiveCacheHier
   output                                                  dmemreq_rdy,  // stalls pipeline
   output [`VC_MEM_RESP_MSG_SZ(p_data_sz)-1:0]            dmemresp_msg,
   output                                                  dmemresp_val,
-
-  //======================================================================
-  // Memory-facing interface  (connect to DualPortRandDelayMem port 0)
-  //======================================================================
-  // Port 1 of DualPortRandDelayMem is unused; tie its inputs:
-  //   .memreq1_val(1'b0), .memresp1_rdy(1'b1)
+  // Memory interface (DualPortRandDelayMem port 0; port 1: tie .memreq1_val(0), .memresp1_rdy(1))
 
   output [`VC_MEM_REQ_MSG_SZ(p_addr_sz,p_data_sz)-1:0]  memreq_msg,
   output                                                  memreq_val,
@@ -121,13 +68,9 @@ module cache_ExclusiveCacheHier
   input                                                   memresp_val,
   output                                                  memresp_rdy
 );
-
-  //======================================================================
   // Internal SWAP wire declarations
   // All line sizes are equal (enforced by parameter constraints above).
   // Using p_l2_line_sz as the canonical inter-cache line size.
-  //======================================================================
-
   localparam LINE_SZ = p_l2_line_sz;
 
   // ---- L1I → Arbiter port 0 ------------------------------------------
@@ -169,11 +112,7 @@ module cache_ExclusiveCacheHier
   wire [`CACHE_SWAP_RESP_SZ(LINE_SZ)-1:0]  l3_dn_resp_msg;
   wire                                       l3_dn_resp_val;
   wire                                       l3_dn_resp_rdy;
-
-  //======================================================================
   // L1 Instruction Cache  (read-only; CPU sends only loads / ifeches)
-  //======================================================================
-
   cache_L1Cache #(
     .p_num_sets (p_l1i_num_sets),
     .p_num_ways (p_l1i_num_ways),
@@ -197,11 +136,7 @@ module cache_ExclusiveCacheHier
     .dn_resp_val  (l1i_dn_resp_val),
     .dn_resp_rdy  (l1i_dn_resp_rdy)
   );
-
-  //======================================================================
   // L1 Data Cache  (read-write)
-  //======================================================================
-
   cache_L1Cache #(
     .p_num_sets (p_l1d_num_sets),
     .p_num_ways (p_l1d_num_ways),
@@ -225,11 +160,7 @@ module cache_ExclusiveCacheHier
     .dn_resp_val  (l1d_dn_resp_val),
     .dn_resp_rdy  (l1d_dn_resp_rdy)
   );
-
-  //======================================================================
   // L1 → L2 Arbiter
-  //======================================================================
-
   cache_Arbiter2to1 #(
     .p_line_sz (LINE_SZ),
     .p_addr_sz (p_addr_sz)
@@ -258,11 +189,7 @@ module cache_ExclusiveCacheHier
     .dn_resp_val (arb_l2_resp_val),
     .dn_resp_rdy (arb_l2_resp_rdy)
   );
-
-  //======================================================================
   // L2 Unified Cache
-  //======================================================================
-
   cache_BaseCache #(
     .p_num_sets (p_l2_num_sets),
     .p_num_ways (p_l2_num_ways),
@@ -286,11 +213,7 @@ module cache_ExclusiveCacheHier
     .dn_resp_val  (l2_dn_resp_val),
     .dn_resp_rdy  (l2_dn_resp_rdy)
   );
-
-  //======================================================================
   // L3 Unified Cache
-  //======================================================================
-
   cache_BaseCache #(
     .p_num_sets (p_l3_num_sets),
     .p_num_ways (p_l3_num_ways),
@@ -314,11 +237,7 @@ module cache_ExclusiveCacheHier
     .dn_resp_val  (l3_dn_resp_val),
     .dn_resp_rdy  (l3_dn_resp_rdy)
   );
-
-  //======================================================================
   // L3 ↔ Main Memory Adapter
-  //======================================================================
-
   cache_L3MemAdapter #(
     .p_line_sz (p_l3_line_sz),
     .p_addr_sz (p_addr_sz),

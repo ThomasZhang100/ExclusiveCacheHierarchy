@@ -1,22 +1,6 @@
-//=========================================================================
-// L1 Cache Controller
-//=========================================================================
-// Handles the L1-specific upstream protocol: the CPU sends plain word-sized
-// VC_MEM requests (addr only, no victim).  The L1 controller is responsible
-// for constructing a SWAP message to send downstream, packaging:
-//
-//   has_victim  = refill_evict_valid   (is the LRU line actually occupied?)
-//   has_refill  = 1                    (always — L1 always needs the data)
-//   victim_addr = refill_evict_addr    (from dpath — reconstructed from stored tag)
-//   victim_data = refill_evict_line    (from dpath — full line data)
-//   refill_addr = line-aligned CPU request address
-//
-// Val/Rdy stalling
-// ----------------
-//   up_req_rdy is deasserted while the FSM is not in STATE_IDLE.
-//   The CPU must hold its request stable until up_req_rdy is re-asserted.
-//   up_resp_val is asserted for one cycle when data is ready; because the
-//   CPU is stalled at that point no up_resp_rdy handshake is needed.
+// L1 cache controller (SWAP protocol).
+// On miss: SWAP has has_victim=refill_evict_valid, has_refill=1, refill_addr=line-aligned CPU addr.
+// up_req_rdy deasserted while FSM is busy; up_resp_val is a one-cycle pulse.
 
 `ifndef CACHE_L1_CACHE_CTRL_V
 `define CACHE_L1_CACHE_CTRL_V
@@ -32,11 +16,7 @@ module cache_L1CacheCtrl
 )(
   input clk,
   input reset,
-
-  //----------------------------------------------------------------------
   // Upstream: CPU-facing word-sized VC_MEM interface
-  //----------------------------------------------------------------------
-
   input                   up_req_val,
   output reg              up_req_rdy,   // deasserted to stall CPU pipeline
 
@@ -45,12 +25,8 @@ module cache_L1CacheCtrl
   input                   req_type_lat,
 
   output reg              up_resp_val,  // one-cycle pulse when data is ready
-
-  //----------------------------------------------------------------------
   // Downstream: SWAP message interface (to L2 via arbiter)
   // See cache-SwapMsg.vh for message layout.
-  //----------------------------------------------------------------------
-
   output reg              dn_req_val,
   input                   dn_req_rdy,
 
@@ -64,11 +40,7 @@ module cache_L1CacheCtrl
   input                   dn_resp_val,
   output reg              dn_resp_rdy,
   input                   dn_resp_has_data,    // should always be 1 for L1 refills
-
-  //----------------------------------------------------------------------
   // Dpath control outputs
-  //----------------------------------------------------------------------
-
   output reg              refill_tag_wen_en,    // enable tag write for refill slot
   output reg              refill_data_wen_en,   // enable data write for refill slot
   output reg              refill_invalidate,    // (unused in L1 miss path; for completeness)
@@ -76,21 +48,13 @@ module cache_L1CacheCtrl
   output reg              lru_update_refill_en, // update LRU after hit or refill
   output reg              store_hit_wen_en,     // store hit: write word into hit line
   output reg              victim_swap_en,
-
-  //----------------------------------------------------------------------
   // Dpath status inputs
-  //----------------------------------------------------------------------
-
   input                   hit,
   input                   victim_hit,
   input                   refill_evict_valid,   // victim is occupied (need has_victim=1)
   input                   refill_evict_dirty    // victim is dirty (informational for L1)
 );
-
-  //----------------------------------------------------------------------
   // FSM state encoding
-  //----------------------------------------------------------------------
-
   localparam STATE_IDLE       = 3'd0;
   localparam STATE_TAG_CHECK  = 3'd1; // tag SRAM read done; evaluate hit/miss
   localparam STATE_HIT_WAIT   = 3'd2; // count down extra hit latency cycles
@@ -101,29 +65,17 @@ module cache_L1CacheCtrl
   localparam STATE_VICTIM_SWAP = 3'd7; // satisfy miss from local victim buffer
 
   reg [2:0] state_reg, state_next;
-
-  //----------------------------------------------------------------------
   // Hit-latency counter
-  //----------------------------------------------------------------------
-
   localparam c_hit_cnt_sz = $clog2(p_hit_lat > 1 ? p_hit_lat : 2);
   reg [c_hit_cnt_sz-1:0] hit_lat_cnt;
 
   localparam c_offset_sz = $clog2(p_line_sz);
-
-  //----------------------------------------------------------------------
   // State register
-  //----------------------------------------------------------------------
-
   always @(posedge clk) begin
     if (reset) state_reg <= STATE_IDLE;
     else       state_reg <= state_next;
   end
-
-  //----------------------------------------------------------------------
   // Hit-latency counter update
-  //----------------------------------------------------------------------
-
   always @(posedge clk) begin
     if (reset) begin
       hit_lat_cnt <= {c_hit_cnt_sz{1'b0}};
@@ -134,11 +86,7 @@ module cache_L1CacheCtrl
         hit_lat_cnt <= hit_lat_cnt - 1'b1;
     end
   end
-
-  //----------------------------------------------------------------------
   // Next-state logic
-  //----------------------------------------------------------------------
-
   always @(*) begin
     state_next = state_reg;
     case (state_reg)
@@ -191,11 +139,7 @@ module cache_L1CacheCtrl
 
     endcase
   end
-
-  //----------------------------------------------------------------------
   // Output logic
-  //----------------------------------------------------------------------
-
   always @(*) begin
     // Safe defaults
     up_req_rdy           = 1'b0;

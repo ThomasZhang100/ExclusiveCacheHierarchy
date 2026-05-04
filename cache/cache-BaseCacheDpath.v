@@ -1,6 +1,4 @@
-//=========================================================================
-// Exclusive Cache Datapath
-//=========================================================================
+// Exclusive cache datapath
 `ifndef CACHE_BASE_CACHE_DPATH_V
 `define CACHE_BASE_CACHE_DPATH_V
 
@@ -81,11 +79,7 @@ module cache_BaseCacheDpath
 
   assign victim_set_idx = vic_set_idx;
   assign same_set       = (vic_set_idx == req_set_idx);
-
-  //----------------------------------------------------------------------
   // Tag SRAM: {dirty(1), valid(1), tag(c_tag_sz)}
-  //----------------------------------------------------------------------
-
   localparam c_tag_entry_sz = 1 + 1 + c_tag_sz; // dirty | valid | tag
 
   reg [c_tag_entry_sz-1:0] tag_array [0:p_num_sets-1][0:p_num_ways-1];
@@ -127,11 +121,7 @@ module cache_BaseCacheDpath
         tag_array[req_set_idx][i][c_tag_entry_sz-1] <= 1'b1;
     end
   end
-
-  //----------------------------------------------------------------------
   // Data SRAM
-  //----------------------------------------------------------------------
-
   reg [c_line_bits-1:0] data_array [0:p_num_sets-1][0:p_num_ways-1];
 
   wire [c_line_bits-1:0] data_rd_refill [0:p_num_ways-1];
@@ -178,11 +168,7 @@ module cache_BaseCacheDpath
       end
     end
   end
-
-  //----------------------------------------------------------------------
   // Hit detection (combinational)
-  //----------------------------------------------------------------------
-
   reg                  hit_r;
   reg [c_way_bits-1:0] hit_way_r;
 
@@ -201,40 +187,14 @@ module cache_BaseCacheDpath
   assign hit     = hit_r;
   assign hit_way = hit_way_r;
 
-  //----------------------------------------------------------------------
-  // Tree Pseudo-LRU replacement
-  //----------------------------------------------------------------------
-  // For p_num_ways ways (must be a power of 2), each set stores
-  // p_num_ways-1 bits as a complete binary tree of internal nodes:
-  //
-  //   bit index 0          → root
-  //   bit index 2i+1       → left  child of node i
-  //   bit index 2i+2       → right child of node i
-  //
-  // Bit convention: 0 = left subtree is the eviction candidate (LRU lives
-  //                     there); 1 = right subtree is the eviction candidate.
-  //
-  // On ACCESS of way W (log2(ways) levels):
-  //   At each tree level, check which subtree W belongs to and flip the
-  //   bit at that node to point AWAY from W, making the other subtree the
-  //   new LRU candidate.
-  //
-  // On EVICTION:
-  //   Follow bits root→leaf; 0 → go left, 1 → go right.
-  //   The accumulated path bits form the LRU way number (MSB first).
-  //
+  // Tree Pseudo-LRU: p_num_ways-1 bits per set; evict by following root→leaf (0=left, 1=right).
 
   localparam c_plru_levels = $clog2(p_num_ways > 1 ? p_num_ways : 2);
-  // At least 1 bit to keep Verilog arrays legal for the direct-mapped case.
   localparam c_plru_bits   = (p_num_ways > 1) ? (p_num_ways - 1) : 1;
 
-  // One tree per set, shared for both refill-set and victim-set lookups.
-  // Reads are indexed by req_set_idx or vic_set_idx; updates by whichever
-  // set the FSM is currently touching (they are in distinct states, so
-  // there is never a write-write conflict).
   reg [c_plru_bits-1:0] plru [0:p_num_sets-1];
 
-  // ---- Eviction: combinational traversal → LRU way ----------------------
+  // Eviction: combinational traversal → LRU way
 
   reg [c_way_bits-1:0] refill_lru_way_r;
   reg [c_way_bits-1:0] victim_lru_way_r;
@@ -273,7 +233,7 @@ module cache_BaseCacheDpath
   assign refill_lru_way = (p_num_ways > 1) ? refill_lru_way_r : {c_way_bits{1'b0}};
   assign victim_lru_way = (p_num_ways > 1) ? victim_lru_way_r : {c_way_bits{1'b0}};
 
-  // ---- Update: flip bits along the path to the accessed way -------------
+  // Update: flip bits along the path to the accessed way
 
   integer k;
   integer plru_upd_node, plru_upd_lvl, plru_upd_bit;
@@ -316,11 +276,7 @@ module cache_BaseCacheDpath
       end
     end
   end
-
-  //----------------------------------------------------------------------
   // Refill-set eviction info
-  //----------------------------------------------------------------------
-
   wire [c_tag_entry_sz-1:0] refill_evict_entry = tag_rd_refill[refill_lru_way];
   wire [c_line_bits-1:0]    refill_evict_data_w = data_rd_refill[refill_lru_way];
 
@@ -328,11 +284,7 @@ module cache_BaseCacheDpath
   assign refill_evict_dirty = refill_evict_entry[c_tag_entry_sz-1]; // dirty bit
   assign refill_evict_line  = refill_evict_data_w;
   assign refill_evict_addr  = {refill_evict_entry[c_tag_sz-1:0], req_set_idx, {c_offset_sz{1'b0}}};
-
-  //----------------------------------------------------------------------
   // Victim-set free-way scan
-  //----------------------------------------------------------------------
-
   reg                   vsfree_r;
   reg [c_way_bits-1:0]  vsfree_way_r;
 
@@ -349,31 +301,19 @@ module cache_BaseCacheDpath
 
   assign victim_set_has_free = vsfree_r;
   assign victim_free_way     = vsfree_way_r;
-
-  //----------------------------------------------------------------------
   // Victim-set LRU eviction info
-  //----------------------------------------------------------------------
-
   wire [c_tag_entry_sz-1:0] victim_evict_entry = tag_rd_victim[victim_lru_way];
   wire [c_line_bits-1:0]    victim_evict_data_w = data_rd_victim[victim_lru_way];
 
   assign victim_set_evict_dirty = victim_evict_entry[c_tag_entry_sz-1];
   assign victim_set_evict_line  = victim_evict_data_w;
   assign victim_set_evict_addr  = {victim_evict_entry[c_tag_sz-1:0], vic_set_idx, {c_offset_sz{1'b0}}};
-
-  //----------------------------------------------------------------------
   // CPU word extraction
-  //----------------------------------------------------------------------
-
   wire [c_offset_sz-3:0]  word_idx = req_offset[c_offset_sz-1:2]; //req_offset[3:2]
 
   assign hit_line      = data_rd_refill[hit_way];
   assign up_resp_rdata = (hit_line[word_idx * p_data_sz +: p_data_sz]) >> (req_offset[1:0] * 8);
-
-  //----------------------------------------------------------------------
   // Cache invalidation at reset
-  //----------------------------------------------------------------------
-
   integer si, wi;
   initial begin
     for (si = 0; si < p_num_sets; si = si + 1)

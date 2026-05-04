@@ -1,6 +1,4 @@
-//=========================================================================
-// L2 / L3 Cache  (SWAP upstream and downstream)
-//=========================================================================
+// L2/L3 cache (SWAP upstream and downstream)
 `ifndef CACHE_BASE_CACHE_V
 `define CACHE_BASE_CACHE_V
 
@@ -40,30 +38,18 @@ module cache_BaseCache
   localparam c_line_bits = p_line_sz * 8;
   localparam c_way_bits  = $clog2(p_num_ways > 1 ? p_num_ways : 2);
   localparam c_set_bits  = $clog2(p_num_sets > 1 ? p_num_sets : 2);
-
-  //----------------------------------------------------------------------
   // Unpack upstream SWAP request
   // Layout (MSB→LSB): has_victim | has_refill | victim_addr | refill_addr | victim_data
-  //----------------------------------------------------------------------
-
   wire [c_line_bits-1:0]  up_victim_data  = up_req_msg[c_line_bits-1    : 0];
   wire [p_addr_sz-1:0]    up_refill_addr  = up_req_msg[c_line_bits+31   : c_line_bits];
   wire [p_addr_sz-1:0]    up_victim_addr  = up_req_msg[c_line_bits+63   : c_line_bits+32];
   wire                     up_victim_dirty = up_req_msg[c_line_bits+64];
   wire                     up_has_refill   = up_req_msg[c_line_bits+65];
   wire                     up_has_victim   = up_req_msg[c_line_bits+66];
-
-  //----------------------------------------------------------------------
   // Unpack downstream SWAP response
-  //----------------------------------------------------------------------
-
   wire [c_line_bits-1:0]  dn_refill_data = dn_resp_msg[c_line_bits-1 : 0];
   wire                     dn_has_data    = dn_resp_msg[c_line_bits];
-
-  //----------------------------------------------------------------------
   // Dpath ↔ ctrl wires
-  //----------------------------------------------------------------------
-
   wire                  hit;
   wire [c_way_bits-1:0] hit_way;
   wire                  same_set;
@@ -103,11 +89,7 @@ module cache_BaseCache
   wire                    ctrl_up_resp_val;
   wire                    ctrl_dn_resp_rdy;
   wire                    ctrl_tag_check;
-
-  //----------------------------------------------------------------------
   // Controller
-  //----------------------------------------------------------------------
-
   cache_BaseCacheCtrl #(
     .p_num_sets (p_num_sets),
     .p_num_ways (p_num_ways),
@@ -159,12 +141,8 @@ module cache_BaseCache
 
   assign up_req_rdy  = ctrl_up_req_rdy;
   assign up_resp_val = ctrl_up_resp_val;
-
-  //----------------------------------------------------------------------
   // Latch upstream SWAP request fields for stable dpath use
   // (same pattern as L1Cache latching req_addr_lat etc. from its ctrl)
-  //----------------------------------------------------------------------
-
   reg                   lat_has_victim;
   reg [p_addr_sz-1:0]   lat_refill_addr;
   reg [p_addr_sz-1:0]   lat_victim_addr;
@@ -186,11 +164,7 @@ module cache_BaseCache
       lat_victim_data  <= up_victim_data;
     end
   end
-
-  //----------------------------------------------------------------------
   // One-hot way decoders
-  //----------------------------------------------------------------------
-
   // Refill set: use hit_way on hit (INPLACE_SWAP/INVALIDATE_A),
   // use refill_lru_way on miss (REFILL_WR).
   // The ctrl's refill_tag_wen_en is asserted in both INPLACE_SWAP and REFILL_WR.
@@ -228,19 +202,11 @@ module cache_BaseCache
         victim_set_evict_oh[w] = 1'b1;
     end
   end
-
-  //----------------------------------------------------------------------
   // Data source mux for refill slot
   // inplace_swap=1: write incoming victim data (V takes A's exact slot)
   // inplace_swap=0: write downstream refill data (normal miss path)
-  //----------------------------------------------------------------------
-
   wire [c_line_bits-1:0] refill_line_mux = inplace_swap ? lat_victim_data : dn_refill_data;
-
-  //----------------------------------------------------------------------
   // Datapath
-  //----------------------------------------------------------------------
-
   wire [p_data_sz-1:0] up_resp_rdata;
 
   cache_BaseCacheDpath #(
@@ -298,12 +264,8 @@ module cache_BaseCache
     .victim_set_evict_line  (victim_set_evict_line),
     .victim_set_evict_dirty (victim_set_evict_dirty)
   );
-
-  //----------------------------------------------------------------------
   // Pack upstream SWAP response
   // has_data=1 indicates refill data is present (hit or miss with data)
-  //----------------------------------------------------------------------
-
   // On hit: the line was in this cache — use dpath's up_resp_rdata (word)
   // But the upstream level needs the full LINE (to store in L1).
   // Latch hit_line (= data_rd_refill[hit_way]) during TAG_CHECK before it can be
@@ -331,14 +293,10 @@ module cache_BaseCache
   wire [c_line_bits-1:0] up_resp_line = resp_from_hit ? hit_line_latch : dn_refill_data;
 
   assign up_resp_msg = {1'b1, up_resp_line};
-
-  //----------------------------------------------------------------------
   // Pack downstream SWAP request
   // Victim mux:
   //   EVICT_V_REQ (has_refill=0): victim = victim_set_evict (V3)
   //   SWAP_REQ    (has_refill=1): victim = refill_evict     (V2, this cache's own)
-  //----------------------------------------------------------------------
-
   // Downstream victim is always V3 from victim_set_evict_*:
   //   EVICT_V_REQ (hit path, has_refill=0): evicting V3 to make room for V1
   //   SWAP_REQ    (miss path, has_refill=1): V3 piggybacked onto the refill SWAP

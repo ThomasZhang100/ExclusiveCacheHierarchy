@@ -1,26 +1,6 @@
-//=========================================================================
-// L3 Cache ↔ Main Memory Adapter  (SWAP → word-sized VC_MEM)
-//=========================================================================
-// Bridges L3's line-sized SWAP downstream interface to the word-sized
-// (32-bit data) VC_MEM interface of vc_TestDualPortRandDelayMem.
-//
-// A single SWAP request from L3 is decomposed into c_words_per_line
-// sequential word-sized memory transactions:
-//
-//   has_refill=1, has_victim=0  →  c_words_per_line READ  requests
-//   has_refill=0, has_victim=1  →  c_words_per_line WRITE requests  (pure eviction)
-//   has_refill=1, has_victim=1  →  c_words_per_line WRITEs (victim first)
-//                                   then c_words_per_line READs  (refill)
-//
-// Latency note
-// ------------
-// In real DRAM, only the FIRST word of a burst incurs the full DRAM
-// latency (row activation + CAS); subsequent words arrive at bus speed.
-// The DualPortRandDelayMem applies an independent random delay per word
-// request, which does NOT model this.  A more accurate adapter would issue
-// a single address and let a burst controller deliver the remaining words.
-// This limitation is noted here; the scaffold matches the available memory
-// interface rather than real DRAM timing.
+// L3 to main memory adapter (SWAP → word-sized VC_MEM).
+// Decomposes line-sized SWAP into sequential word reads/writes:
+//   has_refill=1,has_victim=0: reads only; 0,1: writes only; 1,1: writes then reads.
 
 `ifndef CACHE_L3_MEM_ADAPTER_V
 `define CACHE_L3_MEM_ADAPTER_V
@@ -37,11 +17,7 @@ module cache_L3MemAdapter
 )(
   input clk,
   input reset,
-
-  //----------------------------------------------------------------------
   // SWAP interface facing L3 downstream
-  //----------------------------------------------------------------------
-
   input  [`CACHE_SWAP_REQ_SZ(p_line_sz)-1:0]   dn_req_msg,
   input                                          dn_req_val,
   output                                         dn_req_rdy,
@@ -49,11 +25,7 @@ module cache_L3MemAdapter
   output [`CACHE_SWAP_RESP_SZ(p_line_sz)-1:0]  dn_resp_msg,
   output                                         dn_resp_val,
   input                                          dn_resp_rdy,
-
-  //----------------------------------------------------------------------
   // Word-sized VC_MEM interface facing DualPortRandDelayMem (port 0)
-  //----------------------------------------------------------------------
-
   output [`VC_MEM_REQ_MSG_SZ(p_addr_sz,p_data_sz)-1:0]  memreq_msg,
   output                                                  memreq_val,
   input                                                   memreq_rdy,
@@ -62,20 +34,12 @@ module cache_L3MemAdapter
   input                                                   memresp_val,
   output                                                  memresp_rdy
 );
-
-  //----------------------------------------------------------------------
   // Derived constants
-  //----------------------------------------------------------------------
-
   localparam c_line_bits      = p_line_sz * 8;
   localparam c_bytes_per_word = p_data_sz / 8;
   localparam c_words_per_line = p_line_sz / c_bytes_per_word; // e.g. 16/4 = 4
   localparam c_word_cnt_sz    = $clog2(c_words_per_line + 1);
-
-  //----------------------------------------------------------------------
   // Unpack incoming SWAP request
-  //----------------------------------------------------------------------
-
   wire [c_line_bits-1:0]  req_victim_data  = dn_req_msg[c_line_bits-1    : 0];
   wire [p_addr_sz-1:0]    req_refill_addr  = dn_req_msg[c_line_bits+31   : c_line_bits];
   wire [p_addr_sz-1:0]    req_victim_addr  = dn_req_msg[c_line_bits+63   : c_line_bits+32];
@@ -86,11 +50,7 @@ module cache_L3MemAdapter
   // Unpack VC_MEM response data field
   // VC_MEM_RESP layout (MSB→LSB): type(1) | len(2) | data(p_data_sz)
   wire [p_data_sz-1:0] memresp_data = memresp_msg[p_data_sz-1:0];
-
-  //----------------------------------------------------------------------
   // FSM state encoding
-  //----------------------------------------------------------------------
-
   localparam STATE_IDLE         = 3'd0; // waiting for SWAP from L3
   localparam STATE_WRITE_REQ    = 3'd1; // issuing word WRITE requests (victim eviction)
   localparam STATE_WRITE_RESP   = 3'd2; // collecting write acks
@@ -99,39 +59,23 @@ module cache_L3MemAdapter
   localparam STATE_DONE         = 3'd5; // drive dn_resp_val for one cycle
 
   reg [2:0] state_reg, state_next;
-
-  //----------------------------------------------------------------------
   // Word counter and line buffer
-  //----------------------------------------------------------------------
-
   reg [c_word_cnt_sz-1:0] word_cnt;   // request counter (address generation)
   reg [c_word_cnt_sz-1:0] resp_cnt;  // response counter (line_buf assembly)
   reg [c_line_bits-1:0]   line_buf;  // assembled from READ responses
-
-  //----------------------------------------------------------------------
   // Latched SWAP request fields
-  //----------------------------------------------------------------------
-
   reg                   lat_has_refill;
   reg                   lat_has_victim;
   reg                   lat_victim_dirty;
   reg [p_addr_sz-1:0]   lat_refill_addr;
   reg [p_addr_sz-1:0]   lat_victim_addr;
   reg [c_line_bits-1:0] lat_victim_data;
-
-  //----------------------------------------------------------------------
   // State register
-  //----------------------------------------------------------------------
-
   always @(posedge clk) begin
     if (reset) state_reg <= STATE_IDLE;
     else       state_reg <= state_next;
   end
-
-  //----------------------------------------------------------------------
   // Next-state logic
-  //----------------------------------------------------------------------
-
   always @(*) begin
     state_next = state_reg;
     case (state_reg)
@@ -186,12 +130,7 @@ module cache_L3MemAdapter
 
     endcase
   end
-
-  //----------------------------------------------------------------------
-  // Current word address computation
-  //----------------------------------------------------------------------
-  // On WRITEs: offset from lat_victim_addr.
-  // On READs:  offset from lat_refill_addr.
+  // Current word address: offset from victim_addr on writes, refill_addr on reads.
 
   wire [p_addr_sz-1:0] cur_base_addr =
     (state_reg == STATE_WRITE_REQ || state_reg == STATE_WRITE_RESP)
@@ -199,17 +138,9 @@ module cache_L3MemAdapter
 
   wire [p_addr_sz-1:0] cur_word_addr =
     cur_base_addr + {{(p_addr_sz-c_word_cnt_sz-2){1'b0}}, word_cnt, 2'b00};
-
-  //----------------------------------------------------------------------
   // Current word data (slice from latched victim line for writes)
-  //----------------------------------------------------------------------
-
   wire [p_data_sz-1:0] cur_word_data = lat_victim_data[word_cnt * p_data_sz +: p_data_sz];
-
-  //----------------------------------------------------------------------
   // Memory request packing
-  //----------------------------------------------------------------------
-
   wire req_is_write = (state_reg == STATE_WRITE_REQ);
 
   vc_MemReqMsgToBits #(p_addr_sz, p_data_sz) mem_req_pack (
@@ -228,19 +159,11 @@ module cache_L3MemAdapter
                         state_reg == STATE_READ_REQ    ||
                         state_reg == STATE_READ_RESP);
   assign dn_req_rdy  = (state_reg == STATE_IDLE);
-
-  //----------------------------------------------------------------------
   // SWAP response packing
   // Layout (MSB→LSB): has_data | refill_data
-  //----------------------------------------------------------------------
-
   assign dn_resp_msg = {lat_has_refill, line_buf}; // has_data=1 only if we did a refill
   assign dn_resp_val = (state_reg == STATE_DONE);
-
-  //----------------------------------------------------------------------
   // Sequential updates: latch, word counter, line buffer
-  //----------------------------------------------------------------------
-
   always @(posedge clk) begin
     if (reset) begin
       word_cnt       <= {c_word_cnt_sz{1'b0}};

@@ -1,36 +1,7 @@
-//=========================================================================
-// Cache Inclusive Message Format
-//=========================================================================
-//
-// -----------------------------------------------------------------------
-// INCL Request  (sent downstream: cache → next level)
-// -----------------------------------------------------------------------
-//
-//  Bit layout (MSB → LSB):
-//
-//   [W+64]       has_victim   (1b)  – 1: request includes a dirty victim to donate
-//   [W+63:W+32]  victim_addr  (32b) – cache-line-aligned address of victim
-//   [W+31:0]     refill_addr  (32b) – cache-line-aligned address to fetch
-//   [W-1:0]      victim_data  (W b) – data of victim line  (W = line_sz*8)
-//
-//   Total bits: 65 + line_sz*8
-//
-// has_victim=0 → cold miss (no dirty victim; clean lines need no writeback)
-// has_victim=1 → dirty victim donation + refill
-//
-// There is no has_refill bit: every request always needs the refill data back.
-// There is no victim_dirty bit: only dirty victims are sent downstream.
-//
-// -----------------------------------------------------------------------
-// INCL Response  (sent upstream: next level → cache)
-// -----------------------------------------------------------------------
-//
-//  Bit layout (MSB → LSB):
-//
-//   [W]      has_data    (1b)  – always 1 in the inclusive hierarchy
-//   [W-1:0]  refill_data (W b) – the requested cache line
-//
-//   Total bits: 1 + line_sz*8
+// INCL message format (W = line_sz*8)
+// Request (65+W bits, MSB→LSB): has_victim(1) | victim_addr(32) | refill_addr(32) | victim_data(W)
+//   has_victim=1: dirty victim donation; all requests need refill back; clean evictions not sent
+// Response (1+W bits, MSB→LSB): has_data(1, always 1) | refill_data(W)
 
 `ifndef CACHE_INCL_MSG_VH
 `define CACHE_INCL_MSG_VH
