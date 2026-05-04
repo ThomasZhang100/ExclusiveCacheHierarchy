@@ -70,6 +70,12 @@ DEFAULT_PARAMS = {
 
 EXPERIMENTS = {
     "default": {},
+    "tiny-l2": {
+        # L2 shrunk to 1 KB (= L1 capacity). Inclusive: L1⊆L2 means L2
+        # holds nothing beyond L1 content, so every L1 eviction goes to L3.
+        # Exclusive: L1+L2 = 2 KB of unique capacity; evictions land in L2.
+        "p_l2_num_sets": 16,
+    },
     "l1-half-capacity": {
         "p_l1i_num_sets": 32,
         "p_l1d_num_sets": 32,
