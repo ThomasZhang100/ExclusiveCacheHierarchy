@@ -60,7 +60,10 @@ def main():
     width = 0.36
 
     plt.style.use("seaborn-v0_8-whitegrid")
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, (ax, ax_tbl) = plt.subplots(
+        2, 1, figsize=(8, 7),
+        gridspec_kw={"height_ratios": [3, 1]},
+    )
 
     bars_e = ax.bar([p - width/2 for p in x], excl, width=width,
                     color="#0f766e", label="Exclusive")
@@ -85,6 +88,36 @@ def main():
     ax.set_xticklabels(BENCHMARKS)
     ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{int(v):,}"))
     ax.legend(frameon=False)
+
+    # --- table ---
+    speedups = [(inc - e) / inc * 100.0 for e, inc in zip(excl, incl)]
+    table_data = [
+        [f"{e:,}" for e in excl],
+        [f"{i:,}" for i in incl],
+        [f"{s:+.1f}%" for s in speedups],
+    ]
+    row_labels  = ["Exclusive (cycles)", "Inclusive (cycles)", "Excl. speedup"]
+    col_labels  = BENCHMARKS
+
+    ax_tbl.axis("off")
+    tbl = ax_tbl.table(
+        cellText=table_data,
+        rowLabels=row_labels,
+        colLabels=col_labels,
+        loc="center",
+        cellLoc="center",
+    )
+    tbl.auto_set_font_size(False)
+    tbl.set_fontsize(9)
+    tbl.scale(1, 1.4)
+
+    # colour the header row and row labels
+    for (row, col), cell in tbl.get_celld().items():
+        if row == 0:
+            cell.set_facecolor("#e5e7eb")
+        elif col == -1:
+            cell.set_facecolor("#f3f4f6")
+        cell.set_edgecolor("#d1d5db")
 
     fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
