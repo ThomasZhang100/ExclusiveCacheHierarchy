@@ -271,7 +271,7 @@ def parse_args():
     parser.add_argument(
         "--max-cycles",
         type=int,
-        default=200000,
+        default=1000000,
         help="Maximum simulated cycles per benchmark run.",
     )
     parser.add_argument(
