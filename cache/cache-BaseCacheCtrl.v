@@ -259,7 +259,7 @@ module cache_BaseCacheCtrl
         dn_req_val         = 1'b1;
         // Victim is V3 from victim_set when victim_set was full on a miss;
         // otherwise no victim (incoming V1 fit in a free slot, or no incoming victim).
-        // L2/L3 never evict from the refill set — they don't keep A.
+        // L2/L3 never evict from the refill set - they don't keep A.
         dn_req_has_victim  = lat_v3_displaced;
         dn_req_has_refill  = 1'b1;
         dn_req_refill_addr = lat_refill_addr;

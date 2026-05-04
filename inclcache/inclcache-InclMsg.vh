@@ -1,7 +1,7 @@
 // INCL message format (W = line_sz*8)
-// Request (65+W bits, MSB→LSB): has_victim(1) | victim_addr(32) | refill_addr(32) | victim_data(W)
+// Request (65+W bits, MSB->LSB): has_victim(1) | victim_addr(32) | refill_addr(32) | victim_data(W)
 //   has_victim=1: dirty victim donation; all requests need refill back; clean evictions not sent
-// Response (1+W bits, MSB→LSB): has_data(1, always 1) | refill_data(W)
+// Response (1+W bits, MSB->LSB): has_data(1, always 1) | refill_data(W)
 
 `ifndef CACHE_INCL_MSG_VH
 `define CACHE_INCL_MSG_VH

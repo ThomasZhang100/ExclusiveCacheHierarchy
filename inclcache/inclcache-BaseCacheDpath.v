@@ -104,7 +104,7 @@ module cache_BaseCacheDpath
       // Refill-set: mark dirty on store hit
       if (store_hit_data_wen[i])
         tag_array[req_set_idx][i][c_tag_entry_sz-1] <= 1'b1;
-      // Victim-set: update victim's slot — dirty=1 (victim is always dirty in inclusive)
+      // Victim-set: update victim's slot - dirty=1 (victim is always dirty in inclusive)
       if (victim_tag_wen[i])
         tag_array[vic_set_idx][i] <= {1'b1, 1'b1, vic_tag};
     end

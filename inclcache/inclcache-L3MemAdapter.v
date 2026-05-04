@@ -1,4 +1,4 @@
-// L3 to main memory adapter (INCL → word-sized VC_MEM).
+// L3 to main memory adapter (INCL -> word-sized VC_MEM).
 // has_victim=0: reads only; has_victim=1: writes (victim always dirty) then reads (refill always needed).
 
 `ifndef CACHE_L3_MEM_ADAPTER_V

@@ -101,8 +101,8 @@ module cache_BaseCacheDpath
   always @(posedge clk) begin
     for (i = 0; i < p_num_ways; i = i + 1) begin
       // Refill-set: write new tag.
-      // inplace_swap=1: V1 (incoming victim) takes A's slot — must use V1's tag/dirty.
-      // inplace_swap=0: normal miss refill — use req_tag and mark_dirty.
+      // inplace_swap=1: V1 (incoming victim) takes A's slot - must use V1's tag/dirty.
+      // inplace_swap=0: normal miss refill - use req_tag and mark_dirty.
       if (refill_tag_wen[i])
         tag_array[req_set_idx][i] <= inplace_swap
           ? {incoming_victim_dirty, 1'b1, vic_tag}
@@ -187,14 +187,14 @@ module cache_BaseCacheDpath
   assign hit     = hit_r;
   assign hit_way = hit_way_r;
 
-  // Tree Pseudo-LRU: p_num_ways-1 bits per set; evict by following root→leaf (0=left, 1=right).
+  // Tree Pseudo-LRU: p_num_ways-1 bits per set; evict by following root->leaf (0=left, 1=right).
 
   localparam c_plru_levels = $clog2(p_num_ways > 1 ? p_num_ways : 2);
   localparam c_plru_bits   = (p_num_ways > 1) ? (p_num_ways - 1) : 1;
 
   reg [c_plru_bits-1:0] plru [0:p_num_sets-1];
 
-  // Eviction: combinational traversal → LRU way
+  // Eviction: combinational traversal -> LRU way
 
   reg [c_way_bits-1:0] refill_lru_way_r;
   reg [c_way_bits-1:0] victim_lru_way_r;
@@ -253,10 +253,10 @@ module cache_BaseCacheDpath
         for (plru_upd_lvl = 0; plru_upd_lvl < c_plru_levels; plru_upd_lvl = plru_upd_lvl + 1) begin
           plru_upd_bit = (lru_update_refill_way >> (c_plru_levels - 1 - plru_upd_lvl)) & 1;
           if (plru_upd_bit == 0) begin
-            plru[req_set_idx][plru_upd_node] <= 1'b1; // W in left  → right is now LRU
+            plru[req_set_idx][plru_upd_node] <= 1'b1; // W in left  -> right is now LRU
             plru_upd_node = 2 * plru_upd_node + 1;
           end else begin
-            plru[req_set_idx][plru_upd_node] <= 1'b0; // W in right → left  is now LRU
+            plru[req_set_idx][plru_upd_node] <= 1'b0; // W in right -> left  is now LRU
             plru_upd_node = 2 * plru_upd_node + 2;
           end
         end

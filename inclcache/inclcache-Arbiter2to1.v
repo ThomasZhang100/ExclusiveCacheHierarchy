@@ -47,13 +47,13 @@ module cache_Arbiter2to1
                                                  1'b0;
 
   wire effective_grant = lock_active ? lock_grant : free_grant_sel;
-  // Request mux → downstream
+  // Request mux -> downstream
   assign dn_req_msg = (effective_grant == 1'b0) ? req0_msg : req1_msg;
   assign dn_req_val = (effective_grant == 1'b0) ? req0_val : req1_val;
-  // Ready demux → upstream ports
+  // Ready demux -> upstream ports
   assign req0_rdy = (effective_grant == 1'b0) ? dn_req_rdy : 1'b0;
   assign req1_rdy = (effective_grant == 1'b1) ? dn_req_rdy : 1'b0;
-  // Response demux → upstream ports
+  // Response demux -> upstream ports
   assign resp0_msg = dn_resp_msg;
   assign resp1_msg = dn_resp_msg;
 

@@ -45,7 +45,7 @@ module cache_BaseCache
   wire                     up_has_victim  = up_req_msg[c_line_bits+64];
   // Unpack downstream INCL response
   wire [c_line_bits-1:0] dn_refill_data = dn_resp_msg[c_line_bits-1:0];
-  // Latch upstream request fields on accept (IDLE → TAG_CHECK)
+  // Latch upstream request fields on accept (IDLE -> TAG_CHECK)
   reg                   lat_has_victim;
   reg [p_addr_sz-1:0]   lat_refill_addr;
   reg [p_addr_sz-1:0]   lat_victim_addr;
@@ -66,7 +66,7 @@ module cache_BaseCache
       lat_victim_data <= up_victim_data;
     end
   end
-  // Dpath ↔ Ctrl wires
+  // Dpath <-> Ctrl wires
   wire                   hit;
   wire [c_way_bits-1:0]  hit_way;
   wire [c_way_bits-1:0]  victim_hit_way;

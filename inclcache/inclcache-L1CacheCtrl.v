@@ -158,7 +158,7 @@ module cache_L1CacheCtrl
 
       STATE_MISS_REQ: begin
         dn_req_val        = 1'b1;
-        // Only include victim if it was occupied AND dirty — clean lines
+        // Only include victim if it was occupied AND dirty - clean lines
         // are already correct in L2 (inclusive invariant).
         dn_req_has_victim = refill_evict_valid && refill_evict_dirty;
         dn_req_refill_addr = {req_addr_lat[p_addr_sz-1:c_offset_sz], {c_offset_sz{1'b0}}};

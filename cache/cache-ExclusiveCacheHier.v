@@ -1,4 +1,4 @@
-// Exclusive 3-level cache hierarchy (SWAP protocol): L1I+L1D → Arbiter → L2 → L3 → MemAdapter
+// Exclusive 3-level cache hierarchy (SWAP protocol): L1I+L1D -> Arbiter -> L2 -> L3 -> MemAdapter
 // Lines live in exactly one level; SWAP carries victim+refill. L1 deasserts *req_rdy during misses.
 
 `ifndef CACHE_EXCLUSIVE_CACHE_HIER_V
@@ -73,7 +73,7 @@ module cache_ExclusiveCacheHier
   // Using p_l2_line_sz as the canonical inter-cache line size.
   localparam LINE_SZ = p_l2_line_sz;
 
-  // ---- L1I → Arbiter port 0 ------------------------------------------
+  // ---- L1I -> Arbiter port 0 ------------------------------------------
   wire [`CACHE_SWAP_REQ_SZ(LINE_SZ)-1:0]   l1i_dn_req_msg;
   wire                                       l1i_dn_req_val;
   wire                                       l1i_dn_req_rdy;
@@ -81,7 +81,7 @@ module cache_ExclusiveCacheHier
   wire                                       l1i_dn_resp_val;
   wire                                       l1i_dn_resp_rdy;
 
-  // ---- L1D → Arbiter port 1 ------------------------------------------
+  // ---- L1D -> Arbiter port 1 ------------------------------------------
   wire [`CACHE_SWAP_REQ_SZ(LINE_SZ)-1:0]   l1d_dn_req_msg;
   wire                                       l1d_dn_req_val;
   wire                                       l1d_dn_req_rdy;
@@ -89,7 +89,7 @@ module cache_ExclusiveCacheHier
   wire                                       l1d_dn_resp_val;
   wire                                       l1d_dn_resp_rdy;
 
-  // ---- Arbiter → L2 upstream -----------------------------------------
+  // ---- Arbiter -> L2 upstream -----------------------------------------
   wire [`CACHE_SWAP_REQ_SZ(LINE_SZ)-1:0]   arb_l2_req_msg;
   wire                                       arb_l2_req_val;
   wire                                       arb_l2_req_rdy;
@@ -97,7 +97,7 @@ module cache_ExclusiveCacheHier
   wire                                       arb_l2_resp_val;
   wire                                       arb_l2_resp_rdy;
 
-  // ---- L2 downstream → L3 upstream -----------------------------------
+  // ---- L2 downstream -> L3 upstream -----------------------------------
   wire [`CACHE_SWAP_REQ_SZ(LINE_SZ)-1:0]   l2_dn_req_msg;
   wire                                       l2_dn_req_val;
   wire                                       l2_dn_req_rdy;
@@ -105,7 +105,7 @@ module cache_ExclusiveCacheHier
   wire                                       l2_dn_resp_val;
   wire                                       l2_dn_resp_rdy;
 
-  // ---- L3 downstream → L3MemAdapter ----------------------------------
+  // ---- L3 downstream -> L3MemAdapter ----------------------------------
   wire [`CACHE_SWAP_REQ_SZ(LINE_SZ)-1:0]   l3_dn_req_msg;
   wire                                       l3_dn_req_val;
   wire                                       l3_dn_req_rdy;
@@ -160,7 +160,7 @@ module cache_ExclusiveCacheHier
     .dn_resp_val  (l1d_dn_resp_val),
     .dn_resp_rdy  (l1d_dn_resp_rdy)
   );
-  // L1 → L2 Arbiter
+  // L1 -> L2 Arbiter
   cache_Arbiter2to1 #(
     .p_line_sz (LINE_SZ),
     .p_addr_sz (p_addr_sz)
@@ -237,7 +237,7 @@ module cache_ExclusiveCacheHier
     .dn_resp_val  (l3_dn_resp_val),
     .dn_resp_rdy  (l3_dn_resp_rdy)
   );
-  // L3 ↔ Main Memory Adapter
+  // L3 <-> Main Memory Adapter
   cache_L3MemAdapter #(
     .p_line_sz (p_l3_line_sz),
     .p_addr_sz (p_addr_sz),

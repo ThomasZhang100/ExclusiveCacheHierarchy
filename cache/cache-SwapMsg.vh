@@ -1,7 +1,7 @@
 // SWAP message format (W = line_sz*8)
-// Request (67+W bits, MSB→LSB): has_victim(1) | has_refill(1) | victim_dirty(1) | victim_addr(32) | refill_addr(32) | victim_data(W)
+// Request (67+W bits, MSB->LSB): has_victim(1) | has_refill(1) | victim_dirty(1) | victim_addr(32) | refill_addr(32) | victim_data(W)
 //   has_victim=0,has_refill=1: cold miss; 1,1: swap; 1,0: pure eviction
-// Response (1+W bits, MSB→LSB): has_data(1) | refill_data(W)  [has_data=0: eviction ack]
+// Response (1+W bits, MSB->LSB): has_data(1) | refill_data(W)  [has_data=0: eviction ack]
 
 `ifndef CACHE_SWAP_MSG_VH
 `define CACHE_SWAP_MSG_VH

@@ -166,7 +166,7 @@ module cache_L1CacheCtrl
 
       STATE_TAG_CHECK: begin
         // For a store hit, write the store word into the cache line and mark
-        // dirty now (synchronous write fires on the TAG_CHECK→RESP edge).
+        // dirty now (synchronous write fires on the TAG_CHECK->RESP edge).
         if (hit && req_type_lat)
           store_hit_wen_en = 1'b1;
       end

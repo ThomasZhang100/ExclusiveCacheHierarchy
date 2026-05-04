@@ -194,7 +194,7 @@ module cache_BaseCacheCtrl
       STATE_REFILL_WR: begin
         refill_tag_wen_en  = 1'b1;
         refill_data_wen_en = 1'b1;
-        // mark_dirty stays 0 at L2/L3 — stores are write-allocated at L1
+        // mark_dirty stays 0 at L2/L3 - stores are write-allocated at L1
       end
 
       STATE_RESP: begin

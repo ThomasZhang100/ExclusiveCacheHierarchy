@@ -39,7 +39,7 @@ module cache_BaseCache
   localparam c_way_bits  = $clog2(p_num_ways > 1 ? p_num_ways : 2);
   localparam c_set_bits  = $clog2(p_num_sets > 1 ? p_num_sets : 2);
   // Unpack upstream SWAP request
-  // Layout (MSB→LSB): has_victim | has_refill | victim_addr | refill_addr | victim_data
+  // Layout (MSB->LSB): has_victim | has_refill | victim_addr | refill_addr | victim_data
   wire [c_line_bits-1:0]  up_victim_data  = up_req_msg[c_line_bits-1    : 0];
   wire [p_addr_sz-1:0]    up_refill_addr  = up_req_msg[c_line_bits+31   : c_line_bits];
   wire [p_addr_sz-1:0]    up_victim_addr  = up_req_msg[c_line_bits+63   : c_line_bits+32];
@@ -49,7 +49,7 @@ module cache_BaseCache
   // Unpack downstream SWAP response
   wire [c_line_bits-1:0]  dn_refill_data = dn_resp_msg[c_line_bits-1 : 0];
   wire                     dn_has_data    = dn_resp_msg[c_line_bits];
-  // Dpath ↔ ctrl wires
+  // Dpath <-> ctrl wires
   wire                  hit;
   wire [c_way_bits-1:0] hit_way;
   wire                  same_set;
@@ -266,7 +266,7 @@ module cache_BaseCache
   );
   // Pack upstream SWAP response
   // has_data=1 indicates refill data is present (hit or miss with data)
-  // On hit: the line was in this cache — use dpath's up_resp_rdata (word)
+  // On hit: the line was in this cache - use dpath's up_resp_rdata (word)
   // But the upstream level needs the full LINE (to store in L1).
   // Latch hit_line (= data_rd_refill[hit_way]) during TAG_CHECK before it can be
   // overwritten (e.g. by INPLACE_SWAP on the next clock edge).
@@ -300,7 +300,7 @@ module cache_BaseCache
   // Downstream victim is always V3 from victim_set_evict_*:
   //   EVICT_V_REQ (hit path, has_refill=0): evicting V3 to make room for V1
   //   SWAP_REQ    (miss path, has_refill=1): V3 piggybacked onto the refill SWAP
-  // L2/L3 never evict from the refill set — they don't keep A.
+  // L2/L3 never evict from the refill set - they don't keep A.
   wire [p_addr_sz-1:0]   dn_victim_addr  = victim_set_evict_addr;
   wire [c_line_bits-1:0] dn_victim_data  = victim_set_evict_line;
   wire                   dn_victim_dirty = victim_set_evict_dirty;

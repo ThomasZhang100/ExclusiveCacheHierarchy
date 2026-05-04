@@ -1,4 +1,4 @@
-// L3 to main memory adapter (SWAP → word-sized VC_MEM).
+// L3 to main memory adapter (SWAP -> word-sized VC_MEM).
 // Decomposes line-sized SWAP into sequential word reads/writes:
 //   has_refill=1,has_victim=0: reads only; 0,1: writes only; 1,1: writes then reads.
 
@@ -48,7 +48,7 @@ module cache_L3MemAdapter
   wire                     req_has_victim   = dn_req_msg[c_line_bits+66];
 
   // Unpack VC_MEM response data field
-  // VC_MEM_RESP layout (MSB→LSB): type(1) | len(2) | data(p_data_sz)
+  // VC_MEM_RESP layout (MSB->LSB): type(1) | len(2) | data(p_data_sz)
   wire [p_data_sz-1:0] memresp_data = memresp_msg[p_data_sz-1:0];
   // FSM state encoding
   localparam STATE_IDLE         = 3'd0; // waiting for SWAP from L3
@@ -160,7 +160,7 @@ module cache_L3MemAdapter
                         state_reg == STATE_READ_RESP);
   assign dn_req_rdy  = (state_reg == STATE_IDLE);
   // SWAP response packing
-  // Layout (MSB→LSB): has_data | refill_data
+  // Layout (MSB->LSB): has_data | refill_data
   assign dn_resp_msg = {lat_has_refill, line_buf}; // has_data=1 only if we did a refill
   assign dn_resp_val = (state_reg == STATE_DONE);
   // Sequential updates: latch, word counter, line buffer
@@ -213,13 +213,13 @@ module cache_L3MemAdapter
 
       // Reset both counters when entering READ_REQ from another state (e.g. WRITE_RESP).
       // Placed AFTER the ack/response collection so this reset wins over any simultaneous
-      // final-ack increment on the WRITE_RESP → READ_REQ transition cycle.
+      // final-ack increment on the WRITE_RESP -> READ_REQ transition cycle.
       if (state_next == STATE_READ_REQ && state_reg != STATE_READ_REQ) begin
         word_cnt <= {c_word_cnt_sz{1'b0}};
         resp_cnt <= {c_word_cnt_sz{1'b0}};
       end
 
-      // Reset counters on DONE → IDLE
+      // Reset counters on DONE -> IDLE
       if (state_reg == STATE_DONE && dn_resp_rdy) begin
         word_cnt <= {c_word_cnt_sz{1'b0}};
         resp_cnt <= {c_word_cnt_sz{1'b0}};

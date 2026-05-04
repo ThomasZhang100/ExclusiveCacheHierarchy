@@ -89,7 +89,7 @@ module cache_L1Cache
   reg [c_line_bits-1:0] victim_line;
   wire                  victim_hit = p_use_victim_buf && victim_valid && (victim_addr == req_line_addr);
 
-  // Latched request fields — registered here, fed to ctrl and dpath
+  // Latched request fields - registered here, fed to ctrl and dpath
   reg                  req_type_lat;
   reg [1:0]            req_len_lat;
   reg [p_addr_sz-1:0]  req_addr_lat;
